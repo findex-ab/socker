@@ -1,0 +1,28 @@
+{
+  "name": "socker",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "lint": "prettier ./src --write",
+    "test": "npx tsx --test --experimental-test-module-mocks \"./src/**/*.test.ts\" --report-compact --no-warnings",
+    "demo-server": "npx tsx ./demo-server/src/index.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/ws": "^8.18.1",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "ws": "^8.18.2",
+    "zod": "^3.25.61"
+  }
+}
