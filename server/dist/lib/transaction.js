@@ -22,7 +22,6 @@ export class Transaction {
         this.outputDir = init.outputDir || this.outputDir;
     }
     getFilename() {
-        console.log(123);
         return `${this.uuid}.bin`;
     }
     getFilepath() {
