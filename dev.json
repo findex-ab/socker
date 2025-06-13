@@ -6,7 +6,8 @@
       "script": "src/index.ts",
       "exec_mode": "fork",
       "interpreter": "tsx",
-      "ignore_watch" : ["./*.json"],
+      "ignore_watch" : ["./*.json", "node_modules", "dist"],
+      "watch": ["./demo-server/src", "./server/src"],
       "env": {
         "NODE_ENV": "development"
       }

@@ -1,5 +1,6 @@
 //const range = (n: number): Array<number> => Array.from(Array(n).keys())
 import { int32ToByteArray, uint32ToByteArray } from "./binary";
+import { BinaryPrimitive } from "./binaryPrimitive";
 export class DynamicBuffer {
     data = new Uint8Array(0);
     cursor = 0;
@@ -97,6 +98,20 @@ export class DynamicBuffer {
             data: data
         };
     }
+    readBinaryPrimitive() {
+        const primType = this.readUint32();
+        const compType = this.readUint32();
+        const size = this.readUint32();
+        if (size <= 0)
+            return null;
+        const data = this.read(size);
+        const prim = new BinaryPrimitive();
+        prim.data = data;
+        prim.size = size;
+        prim.type = primType;
+        prim.componentType = compType;
+        return prim;
+    }
     toString() {
         return this.withCursor(0, () => {
             return this.readString(this.data.length);
@@ -136,5 +151,11 @@ export class DynamicBuffer {
         this.writeUint32(blob.type);
         this.writeUint32(blob.size);
         this.write(blob.data);
+    }
+    writeBinaryPrimitive(prim) {
+        this.writeUint32(prim.type);
+        this.writeUint32(prim.componentType);
+        this.writeUint32(prim.data.length);
+        this.write(prim.data);
     }
 }

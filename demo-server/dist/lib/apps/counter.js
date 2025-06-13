@@ -6,9 +6,11 @@ export class MyCounterApp {
         console.log('Counter app init!');
         server.defineMessageHook(this.name, {
             action: 'INCREMENT',
-            parse: z.object({
-                action: z.literal('INCREMENT')
-            }).parse,
+            parse: (store) => {
+                return z.object({
+                    action: z.string()
+                }).parse(store.toJS());
+            },
             callback: (data) => {
                 console.log('Received the increment!', data);
             }

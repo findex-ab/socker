@@ -10,9 +10,9 @@ export class MyCounterApp implements IServerApp {
     server.defineMessageHook(this.name, {
       action: 'INCREMENT',
       parse: (store) => {
-        return {
-          action: store.getString('action')
-        }
+        return z.object({
+          action: z.string()
+        }).parse(store.toJS())
       },
       callback: (data) => {
         console.log('Received the increment!', data);

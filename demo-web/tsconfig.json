@@ -3,7 +3,8 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "#/shared/*": ["../shared/src/*"]
+      "@components/*": ["./components/*"],
+      "~shared": ["../shared"]
     }
   },
   "references": [

@@ -1,3 +1,4 @@
+import { BinaryPrimitive } from "./binaryPrimitive";
 import { BinaryBlob } from "./blob";
 export declare class DynamicBuffer {
     data: Uint8Array;
@@ -18,6 +19,7 @@ export declare class DynamicBuffer {
     readFloat64(): number;
     readString(length: number): string;
     readBinaryBlob(): BinaryBlob | null;
+    readBinaryPrimitive(): BinaryPrimitive | null;
     toString(): string;
     write(data: ArrayBufferLike | Array<number>): void;
     writeString(text: string): void;
@@ -26,4 +28,5 @@ export declare class DynamicBuffer {
     writeFloat32(x: number): void;
     writeFloat64(x: number): void;
     writeBinaryBlob(blob: BinaryBlob): void;
+    writeBinaryPrimitive(prim: BinaryPrimitive): void;
 }

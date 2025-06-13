@@ -7,7 +7,8 @@ export declare enum EBinaryBlob {
     FLOAT64 = 5,
     STRING = 6,
     STRING_JSON = 7,
-    ARB = 8
+    BINARY_KV_STORE = 8,
+    ARB = 9
 }
 export type BinaryBlob = {
     type: EBinaryBlob;

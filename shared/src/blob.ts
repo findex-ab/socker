@@ -13,7 +13,8 @@ export enum EBinaryBlob {
   FLOAT64 = 5,
   STRING = 6,
   STRING_JSON = 7,
-  ARB = 8,
+  BINARY_KV_STORE = 8,
+  ARB = 9,
 }
 
 export type BinaryBlob = {
@@ -49,7 +50,6 @@ export const binaryInt32Blob = (value: number): BinaryBlob => {
 };
 
 export const binaryFloat32Blob = (value: number): BinaryBlob => {
-  console.log('svamp', float32ToByteArray(value).length);
   return {
     type: EBinaryBlob.FLOAT32,
     size: 4,

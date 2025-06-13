@@ -9,7 +9,8 @@ export var EBinaryBlob;
     EBinaryBlob[EBinaryBlob["FLOAT64"] = 5] = "FLOAT64";
     EBinaryBlob[EBinaryBlob["STRING"] = 6] = "STRING";
     EBinaryBlob[EBinaryBlob["STRING_JSON"] = 7] = "STRING_JSON";
-    EBinaryBlob[EBinaryBlob["ARB"] = 8] = "ARB";
+    EBinaryBlob[EBinaryBlob["BINARY_KV_STORE"] = 8] = "BINARY_KV_STORE";
+    EBinaryBlob[EBinaryBlob["ARB"] = 9] = "ARB";
 })(EBinaryBlob || (EBinaryBlob = {}));
 export const binaryStringBlob = (value) => {
     return {
@@ -33,7 +34,6 @@ export const binaryInt32Blob = (value) => {
     };
 };
 export const binaryFloat32Blob = (value) => {
-    console.log('svamp', float32ToByteArray(value).length);
     return {
         type: EBinaryBlob.FLOAT32,
         size: 4,
