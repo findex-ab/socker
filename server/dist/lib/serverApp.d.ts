@@ -1,5 +1,5 @@
 import { SocketClient } from "#/client/client";
-import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
+import { BinaryKeyValueStore } from "socker/shared/binaryKVStore";
 import { ServerMessageEventHook } from "./hooks";
 import { SockerServer } from "./server";
 import { AnyServerEvent } from "./serverEvents";

@@ -1,6 +1,6 @@
 import { describe } from "node:test";
 import { Transaction } from "./transaction";
-import { BinaryPrimitive } from "#/shared/binaryPrimitive";
+import { BinaryPrimitive } from "socker/shared/binaryPrimitive";
 import assert from "node:assert";
 describe('Transaction sanity test', () => {
     const trans = new Transaction({

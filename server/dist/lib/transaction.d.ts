@@ -1,4 +1,4 @@
-import { BinaryKeyValueStore } from '#/shared/binaryKVStore';
+import { BinaryKeyValueStore } from 'socker/shared/binaryKVStore';
 export declare enum ETransactionState {
     NONE = "NONE",
     OPEN = "OPEN",

@@ -1,4 +1,4 @@
-import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
+import { BinaryKeyValueStore } from "socker/shared/binaryKVStore";
 import { IncomingMessage } from "http";
 import { SocketType } from "./socket";
 export type SocketClientMessageCallbackFunction = (data: BinaryKeyValueStore) => any;

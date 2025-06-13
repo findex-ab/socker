@@ -1,9 +1,9 @@
 import { WebSocketServer } from "ws";
-import { EventSystem } from "#/shared/eventSystem";
+import { EventSystem } from "socker/shared/eventSystem";
 import { ServerEventMap } from "./serverEvents";
 import { IServerApp, IServerAppMeta } from "./serverApp";
 import { ServerMessageEventHook } from "./hooks";
-import { BasicState, StateSystem } from "#/shared/stateSystem";
+import { BasicState, StateSystem } from "socker/shared/stateSystem";
 import { SocketClient } from "#/client/client";
 export type SockerServerConfig = {
     host: string;
