@@ -14,13 +14,8 @@
     "strict": true,
     "skipLibCheck": true,
     "composite": true,
-    "typeRoots": ["../node_modules/@types", "./src/index.ts"],
-    "paths": {
-      "#/shared/*": ["../shared/src/*"]
-    }
+    "typeRoots": ["../node_modules/@types", "./src/index.ts"]
   },
   "include": ["src/**/*.ts"],
-  "references": [
-    {"path": "../shared"}
-  ] 
+  "references": []
 }

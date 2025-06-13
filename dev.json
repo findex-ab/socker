@@ -1,0 +1,15 @@
+{
+  "apps": [
+    {
+      "name": "demo-server",
+      "cwd": "./demo-server/",
+      "script": "src/index.ts",
+      "exec_mode": "fork",
+      "interpreter": "tsx",
+      "ignore_watch" : ["./*.json"],
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  ]
+}
