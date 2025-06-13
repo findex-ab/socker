@@ -1,6 +1,6 @@
 {
   "name": "socker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "homepage": "https://github.com/findex-ab/socker#readme",
   "bugs": {
@@ -24,6 +24,20 @@
     "demo-server",
     "client"
   ],
+  "exports": {
+    "./shared": {
+      "types": "./shared/dist/lib/index.d.ts",
+      "default": "./shared/dist/lib/index.js"
+    },
+    "./server": {
+      "types": "./server/dist/lib/index.d.ts",
+      "default": "./server/dist/lib/index.js"
+    },
+    "./client": {
+      "types": "./client/dist/lib/index.d.ts",
+      "default": "./client/dist/lib/index.js"
+    }
+  },
   "devDependencies": {
     "pm2": "^6.0.8",
     "tsx": "^4.20.2"
