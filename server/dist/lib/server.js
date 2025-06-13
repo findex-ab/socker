@@ -7,7 +7,7 @@ import { EServerEvent } from "./serverEvents";
 import * as UUID from 'uuid';
 import { BinaryKeyValueStore } from "socker/shared";
 import { EStateSystemEvent, StateSystem } from "socker/shared";
-import { SocketClient } from "#/client/client";
+import { SocketClient } from "socker/client";
 export class SockerServer {
     config;
     socket = null;

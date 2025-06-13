@@ -4,7 +4,7 @@ import { ServerEventMap } from "./serverEvents";
 import { IServerApp, IServerAppMeta } from "./serverApp";
 import { ServerMessageEventHook } from "./hooks";
 import { BasicState, StateSystem } from "socker/shared";
-import { SocketClient } from "#/client/client";
+import { SocketClient } from "socker/client";
 export type SockerServerConfig = {
     host: string;
     port: number;

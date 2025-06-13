@@ -1,4 +1,4 @@
-import { SocketClient } from "#/client/client";
+import { SocketClient } from "socker/client";
 import { BinaryKeyValueStore } from "socker/shared";
 import { ServerMessageEventHook } from "./hooks";
 import { SockerServer } from "./server";
