@@ -35,7 +35,10 @@ describe('From JS and back', () => {
     lastname: "doe",
     weight: 10.3,
     age: 47,
-    image: imageData 
+    image: imageData,
+    state: {
+      count: 10
+    } 
   });
 
   assert.strictEqual(kv.getString('firstname'), 'john');
@@ -53,4 +56,7 @@ describe('From JS and back', () => {
   assert.strictEqual(data['age'], 47);
   assert.strictEqual(data['image'] instanceof Uint8Array, true);
   assert.strictEqual(data['image'].length, imageData.length);
+  assert.strictEqual(typeof data['state'], 'object');
+  assert.strictEqual(typeof data['state']['count'], 'number');
+  assert.strictEqual(data['state']['count'], 10);
 });

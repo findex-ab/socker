@@ -28,7 +28,21 @@ export class MyCounterApp implements IServerApp {
         setState((state) => ({...state, count: state.count + 1}));
         console.log('Received the increment!', data, state);
       }
-    })
+    });
+
+    server.defineMessageHook(this.name, {
+      action: 'DECREMENT',
+      parse: (store) => {
+        return z.object({
+          action: z.string()
+        }).parse(store.toJS())
+      },
+      callback: (data, ev, server) => {
+        const [state, setState] = server.useClientState(this.name, ev.connection.id, defaultState);
+        setState((state) => ({...state, count: state.count - 1}));
+        console.log('Received the decrement!', data, state);
+      }
+    });
   }
   cleanup() {
     console.log('Cleanup counter app!');

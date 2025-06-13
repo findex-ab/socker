@@ -32,7 +32,7 @@ export class DynamicBuffer {
         return ret;
     }
     getView() {
-        return new DataView(Buffer.from(this.data.slice(this.cursor)).buffer);
+        return new DataView(this.data.slice(this.cursor).buffer);
     }
     load(buffer) {
         if (typeof buffer === 'string') {
@@ -65,23 +65,23 @@ export class DynamicBuffer {
     }
     readUint32() {
         const bytes = this.readBytes(4);
-        const buff = Buffer.from(bytes);
-        return buff.readUint32BE();
+        const view = new DataView((new Uint8Array(bytes)).buffer);
+        return view.getUint32(0, false);
     }
     readInt32() {
         const bytes = this.readBytes(4);
-        const buff = Buffer.from(bytes);
-        return buff.readInt32BE();
+        const view = new DataView((new Uint8Array(bytes)).buffer);
+        return view.getInt32(0, false);
     }
     readFloat32() {
         const bytes = this.readBytes(4);
-        const buff = Buffer.from(bytes);
-        return buff.readFloatBE();
+        const view = new DataView((new Uint8Array(bytes)).buffer);
+        return view.getFloat32(0, false);
     }
     readFloat64() {
         const bytes = this.readBytes(8);
-        const buff = Buffer.from(bytes);
-        return buff.readDoubleBE();
+        const view = new DataView((new Uint8Array(bytes)).buffer);
+        return view.getFloat64(0, false);
     }
     readString(length) {
         return this.readBytes(length).map(code => String.fromCharCode(Number(code))).join('');
@@ -101,6 +101,7 @@ export class DynamicBuffer {
     readBinaryPrimitive() {
         const primType = this.readUint32();
         const compType = this.readUint32();
+        const tag = this.readUint32();
         const size = this.readUint32();
         if (size <= 0)
             return null;
@@ -109,6 +110,7 @@ export class DynamicBuffer {
         prim.data = data;
         prim.size = size;
         prim.type = primType;
+        prim.tag = tag;
         prim.componentType = compType;
         return prim;
     }
@@ -155,6 +157,7 @@ export class DynamicBuffer {
     writeBinaryPrimitive(prim) {
         this.writeUint32(prim.type);
         this.writeUint32(prim.componentType);
+        this.writeUint32(prim.tag);
         this.writeUint32(prim.data.length);
         this.write(prim.data);
     }

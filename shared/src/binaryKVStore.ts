@@ -5,6 +5,7 @@ import { isFloat, isInt, isUint } from "./is";
 export type BinaryKeyValueStoreValue = BinaryPrimitive;
 
 const MAGIC = "BinaryKeyValueStore";
+const TAG = 0x5184;
 
 export type BinaryKeyValueStoreRow = {
   key: string;
@@ -74,6 +75,10 @@ export class BinaryKeyValueStore {
     this.set(key, new BinaryPrimitive(value, EBinaryPrimitiveType.ARRAY, EBinaryPrimitiveComponentType.BYTE));
   }
 
+  setKeyValueStore(key: string, value: BinaryKeyValueStore) {
+    this.set(key, new BinaryPrimitive(value.toBinary(), EBinaryPrimitiveType.ARRAY, EBinaryPrimitiveComponentType.BYTE).setTag(TAG));
+  }
+
   get(key: string): BinaryKeyValueStoreValue | null {
     const row = this.getRow(key);
     if (!row) return null;
@@ -114,6 +119,13 @@ export class BinaryKeyValueStore {
     const value = this.get(key);
     if (value === null) return null;
     return value.getBytes();
+  }
+
+  getKeyValueStore(key: string): BinaryKeyValueStore | null {
+    const value = this.get(key);
+    if (value === null) return null;
+    const bytes = value.getBytes();
+    return BinaryKeyValueStore.fromBinary(bytes);
   }
 
   toBinary(): Uint8Array {
@@ -200,6 +212,12 @@ export class BinaryKeyValueStore {
             kv.set(key, value);
             continue;
           }
+          const keys = Object.keys(value);
+          const isStrings = keys.filter(it => typeof it === 'string').length >= keys.length;
+          if (isStrings) {
+            kv.setKeyValueStore(key, this.fromJS(value));
+            continue;
+          }
         };
         default: {
           console.warn(
@@ -223,7 +241,15 @@ export class BinaryKeyValueStore {
             data[row.key] = row.value.getString();
           } break;
           case EBinaryPrimitiveComponentType.BYTE: {
-            data[row.key] = row.value.getBytes();
+            if (row.value.tag === TAG) {
+              const bytes = row.value.getBytes();
+              const store = BinaryKeyValueStore.fromBinarySafe(bytes);
+              if (store) {
+                data[row.key] = store.toJS();
+              }
+            } else {
+              data[row.key] = row.value.getBytes();
+            }
           }; break;
           case EBinaryPrimitiveComponentType.FLOAT32:
           case EBinaryPrimitiveComponentType.UINT32:

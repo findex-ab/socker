@@ -24,6 +24,7 @@ export class BinaryPrimitive {
   type: EBinaryPrimitiveType = EBinaryPrimitiveType.SCALAR
   componentType: EBinaryPrimitiveComponentType = EBinaryPrimitiveComponentType.NULL;
   size: number = 0;
+  tag: number = 0;
 
   constructor();
   constructor(
@@ -55,6 +56,11 @@ export class BinaryPrimitive {
     return this;
   }
 
+  setTag(tag: number) {
+    this.tag = tag;
+    return this;
+  }
+
   getRawBytes(): number[] {
     return Array.from(this.data.values());
   }
@@ -63,6 +69,11 @@ export class BinaryPrimitive {
     const bytes = this.getRawBytes();
     const buff = Buffer.from(bytes);
     return buff;
+  }
+
+  // PI = platform independant
+  getPIBuffer(): DataView {
+    return new DataView(this.data.buffer)
   }
 
   setUint32(value: number) {
@@ -74,7 +85,7 @@ export class BinaryPrimitive {
   }
 
   getUint32() {
-    return this.getBuffer().readUint32BE();
+    return this.getPIBuffer().getUint32(0, false);//this.getBuffer().readUint32BE();
   }
 
   setInt32(value: number) {
@@ -86,7 +97,7 @@ export class BinaryPrimitive {
   }
 
   getInt32() {
-    return this.getBuffer().readInt32BE();
+    return this.getPIBuffer().getInt32(0, false);//this.getBuffer().readInt32BE();
   }
 
   setFloat32(value: number) {
@@ -98,7 +109,7 @@ export class BinaryPrimitive {
   }
 
   getFloat32() {
-    return this.getBuffer().readFloatBE();
+    return this.getPIBuffer().getFloat32(0, false);//this.getBuffer().readFloatBE();
   }
 
   setNumber(value: number) {
@@ -139,7 +150,7 @@ export class BinaryPrimitive {
   }
 
   getByte() {
-    return this.getBuffer().readUint8();
+    return this.getPIBuffer().getUint8(0);//this.getBuffer().readUint8();
   } 
 
   setChar(value: string) {

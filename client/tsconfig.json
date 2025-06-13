@@ -15,13 +15,11 @@
     "skipLibCheck": true,
     "composite": true,
     "paths": {
-      "#/shared/*": ["../shared/src/*"],
-      "#/client/*": ["../client/src/*"]
+      "#/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src/**/*.ts"],
   "references": [
-    {"path": "../shared"},
-    {"path": "../client"}
-  ] 
+    {"path": "../shared"}
+  ]
 }

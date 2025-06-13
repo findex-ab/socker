@@ -23,6 +23,7 @@ export class BinaryPrimitive {
     type = EBinaryPrimitiveType.SCALAR;
     componentType = EBinaryPrimitiveComponentType.NULL;
     size = 0;
+    tag = 0;
     constructor(data, type, componentType) {
         if (!data)
             return;
@@ -43,6 +44,10 @@ export class BinaryPrimitive {
         this.componentType = compType;
         return this;
     }
+    setTag(tag) {
+        this.tag = tag;
+        return this;
+    }
     getRawBytes() {
         return Array.from(this.data.values());
     }
@@ -50,6 +55,10 @@ export class BinaryPrimitive {
         const bytes = this.getRawBytes();
         const buff = Buffer.from(bytes);
         return buff;
+    }
+    // PI = platform independant
+    getPIBuffer() {
+        return new DataView(this.data.buffer);
     }
     setUint32(value) {
         this.type = EBinaryPrimitiveType.SCALAR;
@@ -59,7 +68,7 @@ export class BinaryPrimitive {
         return this;
     }
     getUint32() {
-        return this.getBuffer().readUint32BE();
+        return this.getPIBuffer().getUint32(0, false); //this.getBuffer().readUint32BE();
     }
     setInt32(value) {
         this.type = EBinaryPrimitiveType.SCALAR;
@@ -69,7 +78,7 @@ export class BinaryPrimitive {
         return this;
     }
     getInt32() {
-        return this.getBuffer().readInt32BE();
+        return this.getPIBuffer().getInt32(0, false); //this.getBuffer().readInt32BE();
     }
     setFloat32(value) {
         this.type = EBinaryPrimitiveType.SCALAR;
@@ -79,7 +88,7 @@ export class BinaryPrimitive {
         return this;
     }
     getFloat32() {
-        return this.getBuffer().readFloatBE();
+        return this.getPIBuffer().getFloat32(0, false); //this.getBuffer().readFloatBE();
     }
     setNumber(value) {
         if (isFloat(value))
@@ -116,7 +125,7 @@ export class BinaryPrimitive {
         return this.data;
     }
     getByte() {
-        return this.getBuffer().readUint8();
+        return this.getPIBuffer().getUint8(0); //this.getBuffer().readUint8();
     }
     setChar(value) {
         return this.setByte(value.charCodeAt(0)).setComponentType(EBinaryPrimitiveComponentType.CHAR);

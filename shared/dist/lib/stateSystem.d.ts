@@ -40,6 +40,7 @@ export type StateSystemEventMap = {
         state: BasicState;
     };
 };
+export type AnyStateSystemEvent = StateSystemEventMap[keyof StateSystemEventMap];
 export declare class StateSystem {
     states: Map<PropertyKey, BasicState>;
     events: EventSystem<StateSystemEventMap>;

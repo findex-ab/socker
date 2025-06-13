@@ -17,6 +17,7 @@ export declare class BinaryKeyValueStore {
     setInt32(key: string, value: number): void;
     setNumber(key: string, value: number): void;
     setBytes(key: string, value: Uint8Array): void;
+    setKeyValueStore(key: string, value: BinaryKeyValueStore): void;
     get(key: string): BinaryKeyValueStoreValue | null;
     getString(key: string): string | null;
     getFloat32(key: string): number;
@@ -24,6 +25,7 @@ export declare class BinaryKeyValueStore {
     getInt32(key: string): number;
     getNumber(key: string): number;
     getBytes(key: string): Uint8Array | null;
+    getKeyValueStore(key: string): BinaryKeyValueStore | null;
     toBinary(): Uint8Array;
     static fromBinary(data: ArrayBufferLike): BinaryKeyValueStore;
     static fromBinarySafe(data: ArrayBufferLike): BinaryKeyValueStore | null;

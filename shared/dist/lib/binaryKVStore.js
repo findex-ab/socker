@@ -2,6 +2,7 @@ import { BinaryPrimitive, EBinaryPrimitiveComponentType, EBinaryPrimitiveType } 
 import { DynamicBuffer } from "./dynamicBuffer";
 import { isFloat, isInt, isUint } from "./is";
 const MAGIC = "BinaryKeyValueStore";
+const TAG = 0x5184;
 export class BinaryKeyValueStore {
     index = 0;
     key_to_index = new Map();
@@ -55,6 +56,9 @@ export class BinaryKeyValueStore {
     setBytes(key, value) {
         this.set(key, new BinaryPrimitive(value, EBinaryPrimitiveType.ARRAY, EBinaryPrimitiveComponentType.BYTE));
     }
+    setKeyValueStore(key, value) {
+        this.set(key, new BinaryPrimitive(value.toBinary(), EBinaryPrimitiveType.ARRAY, EBinaryPrimitiveComponentType.BYTE).setTag(TAG));
+    }
     get(key) {
         const row = this.getRow(key);
         if (!row)
@@ -96,6 +100,13 @@ export class BinaryKeyValueStore {
         if (value === null)
             return null;
         return value.getBytes();
+    }
+    getKeyValueStore(key) {
+        const value = this.get(key);
+        if (value === null)
+            return null;
+        const bytes = value.getBytes();
+        return BinaryKeyValueStore.fromBinary(bytes);
     }
     toBinary() {
         const buff = new DynamicBuffer();
@@ -182,6 +193,12 @@ export class BinaryKeyValueStore {
                             kv.set(key, value);
                             continue;
                         }
+                        const keys = Object.keys(value);
+                        const isStrings = keys.filter(it => typeof it === 'string').length >= keys.length;
+                        if (isStrings) {
+                            kv.setKeyValueStore(key, this.fromJS(value));
+                            continue;
+                        }
                     }
                     ;
                 default: {
@@ -204,7 +221,16 @@ export class BinaryKeyValueStore {
                         break;
                     case EBinaryPrimitiveComponentType.BYTE:
                         {
-                            data[row.key] = row.value.getBytes();
+                            if (row.value.tag === TAG) {
+                                const bytes = row.value.getBytes();
+                                const store = BinaryKeyValueStore.fromBinarySafe(bytes);
+                                if (store) {
+                                    data[row.key] = store.toJS();
+                                }
+                            }
+                            else {
+                                data[row.key] = row.value.getBytes();
+                            }
                         }
                         ;
                         break;

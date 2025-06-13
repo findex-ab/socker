@@ -16,12 +16,13 @@
   "scripts": {
     "build": "npm run build -ws",
     "dev": "pm2-dev --raw ./dev.json",
-    "clean": "rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist"
+    "clean": "rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist; rm -rf ./client/dist;"
   },
   "workspaces": [
     "shared",
     "server",
-    "demo-server"
+    "demo-server",
+    "client"
   ],
   "devDependencies": {
     "pm2": "^6.0.8",

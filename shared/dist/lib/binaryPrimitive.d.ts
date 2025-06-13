@@ -19,12 +19,15 @@ export declare class BinaryPrimitive {
     type: EBinaryPrimitiveType;
     componentType: EBinaryPrimitiveComponentType;
     size: number;
+    tag: number;
     constructor();
     constructor(data: Uint8Array, type: EBinaryPrimitiveType, componentType: EBinaryPrimitiveComponentType);
     setType(typ: EBinaryPrimitiveType): this;
     setComponentType(compType: EBinaryPrimitiveComponentType): this;
+    setTag(tag: number): this;
     getRawBytes(): number[];
     getBuffer(): Buffer;
+    getPIBuffer(): DataView;
     setUint32(value: number): this;
     getUint32(): number;
     setInt32(value: number): this;

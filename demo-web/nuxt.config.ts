@@ -8,6 +8,8 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss'],
   alias: {
     "@components": "./components",
-    "~shared": fileURLToPath(new URL("../shared", import.meta.url))
+    "~shared": fileURLToPath(new URL("../shared", import.meta.url)),
+    "#/shared": fileURLToPath(new URL("../shared/src", import.meta.url)),
+    "~client": fileURLToPath(new URL("../client", import.meta.url))
   }
 })
