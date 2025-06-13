@@ -44,6 +44,7 @@ export class SocketClient {
     onMessage(fn) {
         if (!this.checkSocketAndWarn())
             return () => { };
+        this.socket.binaryType = "arraybuffer";
         const listener = (event) => {
             console.log('EVENT', event);
             console.dir(event);

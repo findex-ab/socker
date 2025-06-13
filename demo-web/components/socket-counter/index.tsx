@@ -7,9 +7,13 @@ export const SocketCounter = defineComponent(() => {
   const count = ref<number>(0);
 
   socket.onReady((sock) => {
-    sock.socket.binaryType = "arraybuffer";
     sock.onMessage((data) => {
-      console.log(`Got some data`, data);
+      if (data.getString('app') === 'counter') {
+        const state = data.getKeyValueStore('state');
+        if (state) {
+          count.value = state.getNumber('count');
+        }
+      }
     })
   })
 
@@ -29,6 +33,9 @@ export const SocketCounter = defineComponent(() => {
   
   return () => {
     return <div>
+      <div class="w-[120px] h-[120px] bg-gray-100 border border-gray-300 text-gray-500 grid items-center justify-center font-semibold">
+        {count.value}
+      </div>
       <div class="w-full grid grid-cols-[max-content_max-content] gap-2">
         <button class="bg-blue-500 text-white px-2 py-1" onClick={increment}>Increment</button>
         <button class="bg-red-500 text-white px-2 py-1" onClick={decrement}>Decrement</button>
