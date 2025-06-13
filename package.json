@@ -14,14 +14,13 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "build": "npm run build -ws && python3 ./fixpaths.py",
+    "build": "npm run build -ws && python3 ./fixpaths.py && ./mkpackage.sh && python3 ./fixpaths.py",
     "dev": "pm2-dev --raw ./dev.json",
-    "clean": "rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist; rm -rf ./client/dist;"
+    "clean": "rm -rf ./tmp; rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist; rm -rf ./client/dist;"
   },
   "workspaces": [
     "shared",
     "server",
-    "demo-server",
     "client"
   ],
   "exports": {

@@ -1,5 +1,5 @@
-import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
-import { IServerApp, SockerServer, Transaction } from "../../../server";
+import { BinaryKeyValueStore } from "socker/shared";
+import { IServerApp, SockerServer, Transaction } from "socker/server";
 import z from 'zod';
 
 const getTransactionId = (clientId: string, fileName: string): string => `${clientId}|${fileName}`;

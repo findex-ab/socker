@@ -1,4 +1,4 @@
-import { AnyServerEvent, EServerEvent, SockerServer, type IServerApp } from '../../../server';
+import { AnyServerEvent, EServerEvent, SockerServer, type IServerApp } from 'socker/server';
 import { z } from 'zod';
 
 

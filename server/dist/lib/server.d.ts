@@ -32,5 +32,5 @@ export declare class SockerServer {
     private onAnyEvent;
     private initApps;
     private postStart;
-    start(): import("ws").Server<typeof import("ws"), typeof import("http").IncomingMessage>;
+    start(): import("ws").Server<typeof import("ws").default, typeof import("http").IncomingMessage>;
 }

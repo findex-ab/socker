@@ -4,13 +4,10 @@
   "compilerOptions": {
     "paths": {
       "@components/*": ["./components/*"],
-      "~shared": ["../shared"],
-      "~client": ["../client"],
-      "#/shared/*": ["../shared/src/*"]
+      "socker/*": ["../tmp/socker/*"]
     }
   },
   "references": [
-    {"path": "../shared"},
-    {"path": "../client"}
+    {"path": "../tmp/socker"}
   ] 
 }

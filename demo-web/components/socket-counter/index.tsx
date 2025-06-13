@@ -1,4 +1,4 @@
-import { BinaryKeyValueStore } from "~shared";
+import { BinaryKeyValueStore } from "socker/shared";
 
 export const SocketCounter = defineComponent(() => {
 

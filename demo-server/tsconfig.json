@@ -13,15 +13,12 @@
     "types": ["node"],
     "strict": true,
     "skipLibCheck": true,
-    "composite": true,
     "paths": {
-      "#/shared/*": ["../shared/src/*"],
-      "#/client/*": ["../client/src/*"]
+      "socker/*": ["../tmp/socker/*"]
     }
   },
   "include": ["src/**/*.ts"],
   "references": [
-    {"path": "../shared"},
-    {"path": "../client"}
+    {"path": "../tmp/socker"},
   ] 
 }

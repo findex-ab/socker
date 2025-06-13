@@ -1,4 +1,4 @@
-import { SocketClient } from "~client";
+import { SocketClient } from "socker/client";
 
 const SOCKET_PORT = 44844;
 const SOCKET_HOST = 'localhost';

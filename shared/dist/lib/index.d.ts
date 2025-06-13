@@ -1,4 +1,5 @@
 export * from './dynamicBuffer';
+export * from './binaryPrimitive';
 export * from './blob';
 export * from './binaryKVStore';
 export * from './dict';
