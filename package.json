@@ -1,6 +1,6 @@
 {
   "name": "socker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "homepage": "https://github.com/findex-ab/socker#readme",
   "bugs": {
@@ -14,7 +14,7 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "build": "npm run build -ws",
+    "build": "npm run build -ws && python3 ./fixpaths.py",
     "dev": "pm2-dev --raw ./dev.json",
     "clean": "rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist; rm -rf ./client/dist;"
   },
