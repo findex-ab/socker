@@ -1,5 +1,5 @@
 import { IncomingMessage } from "http";
-import { BinaryKeyValueStore } from "socker/shared/binaryKVStore";
+import { BinaryKeyValueStore } from "socker/shared";
 import { SocketClient } from "#/client/client";
 export declare enum EServerEvent {
     CLIENT_CONNECTION = "CLIENT_CONNECTION",

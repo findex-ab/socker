@@ -2,11 +2,11 @@ import { WebSocketServer } from "ws";
 import * as fs from "fs";
 import * as https from "https";
 import * as pathlib from "path";
-import { EventSystem } from "socker/shared/eventSystem";
+import { EventSystem } from "socker/shared";
 import { EServerEvent } from "./serverEvents";
 import * as UUID from 'uuid';
-import { BinaryKeyValueStore } from "socker/shared/binaryKVStore";
-import { EStateSystemEvent, StateSystem } from "socker/shared/stateSystem";
+import { BinaryKeyValueStore } from "socker/shared";
+import { EStateSystemEvent, StateSystem } from "socker/shared";
 import { SocketClient } from "#/client/client";
 export class SockerServer {
     config;

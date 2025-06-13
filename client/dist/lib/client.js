@@ -1,4 +1,4 @@
-import { BinaryKeyValueStore } from "socker/shared/binaryKVStore";
+import { BinaryKeyValueStore } from "socker/shared";
 import { SocketImplementation } from "./socket";
 export class SocketClient {
     socket;

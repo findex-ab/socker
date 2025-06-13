@@ -4,7 +4,7 @@ import os
 
 def replace(content: str) -> str:
     # #/shared/
-    content = re.sub('#/shared', 'socker/shared', content)
+    content = re.sub(r'(\'|")(#\/shared.*?)(\'|")', r'\1socker/shared\3', content)
     return content
 
 

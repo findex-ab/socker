@@ -1,4 +1,4 @@
-import { BinaryKeyValueStore } from "socker/shared/binaryKVStore";
+import { BinaryKeyValueStore } from "socker/shared";
 import { SockerServer } from "./server";
 import { EServerEvent, ServerEventMap } from "./serverEvents";
 export type ServerMessageEventHook<T = any> = {
