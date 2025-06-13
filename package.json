@@ -26,18 +26,30 @@
   ],
   "exports": {
     "./shared": {
+      "default": {
+        "types": "./shared/dist/lib/index.d.ts",
+        "default": "./shared/dist/lib/index.js"
+      },
       "main": {
         "types": "./shared/dist/lib/index.d.ts",
         "default": "./shared/dist/lib/index.js"
       }
     },
     "./server": {
+      "default": {
+        "types": "./server/dist/lib/index.d.ts",
+        "default": "./server/dist/lib/index.js"
+      },
       "main": {
         "types": "./server/dist/lib/index.d.ts",
         "default": "./server/dist/lib/index.js"
       }
     },
     "./client": {
+      "default": {
+        "types": "./client/dist/lib/index.d.ts",
+        "default": "./client/dist/lib/index.js"
+      },
       "main": {
         "types": "./client/dist/lib/index.d.ts",
         "default": "./client/dist/lib/index.js"
