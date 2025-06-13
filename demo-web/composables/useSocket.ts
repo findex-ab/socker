@@ -9,7 +9,11 @@ let socket: SocketClient | null = null;
 
 export const useSocket = () => {
   if (socket) return socket;
-  const sock = new SocketClient(new WebSocket(SOCKET_URL), '_');
+  const sock = new SocketClient({
+    socket: new WebSocket(SOCKET_URL),
+    id: '_',
+    socketFactory: () => new WebSocket(SOCKET_URL)
+  });
   socket = sock;
   return sock;
 }

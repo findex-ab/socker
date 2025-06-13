@@ -208,7 +208,11 @@ export class SockerServer {
     
     server.addListener("connection", (socket, req) => {
       const id = UUID.v4();
-      const connection = new SocketClient(socket as unknown as any, id, req);
+      const connection = new SocketClient({
+        socket: socket as unknown as any,
+        id: id,
+        message: req
+      });
       this.clients.set(connection.id, connection);
       this.createClientCleanup(connection.id, () => {
         this.clients.delete(connection.id);

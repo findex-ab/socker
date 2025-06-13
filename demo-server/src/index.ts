@@ -10,7 +10,7 @@ const main = async () => {
     port: 44844
   });
 
-  server.events.subscribe(EServerEvent.CLIENT_OPEN, (ev) => {
+  server.events.subscribe(EServerEvent.CLIENT_CONNECTION, (ev) => {
     console.log(`Hello client!`);
   })
   

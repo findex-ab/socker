@@ -17,6 +17,10 @@ export class FileUploadApp implements IServerApp {
     return this.transactions.get(id)!;
   }
 
+  private deleteTransaction(id: string) {
+    this.transactions.delete(id);
+  }
+
   init(server: SockerServer) {
     server.defineMessageHook(this.name, {
       action: 'TRANSACTION_START',
@@ -72,6 +76,8 @@ export class FileUploadApp implements IServerApp {
         console.log(`Transaction ended: ${transId}`);
         const trans = this.getOrCreateTransaction(transId);
         trans.close();
+
+        this.deleteTransaction(transId);
 
         event.connection.send(BinaryKeyValueStore.fromJS({
           app: this.name,

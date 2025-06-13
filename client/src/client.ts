@@ -1,6 +1,7 @@
 import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
 import { IncomingMessage } from "http";
 import { SocketImplementation, SocketType } from "./socket";
+import { sleep } from "./utils";
 
 export type SocketClientMessageCallbackFunction = (data: BinaryKeyValueStore) => any;
 
@@ -17,16 +18,61 @@ export type SocketClientTransferResult = {
   ok: boolean;
 }
 
+export type ISocketClientInit = {
+  socket: SocketType;
+  id: string;
+  message?: IncomingMessage;
+  socketFactory?: () => SocketType;
+  maxReconnectRetries?: number;
+}
+
 export class SocketClient {
   socket: SocketType;
   connectedMessage: IncomingMessage | null = null;
   id: string;
   authenticated: boolean = false;
+  socketFactory?: () => SocketType;
+  maxReconnectRetries: number = 32;
 
-  constructor(socket: SocketType, id: string, message?: IncomingMessage) {
-    this.socket = socket;
-    this.id = id;
-    this.connectedMessage = message || null;
+  constructor(init: ISocketClientInit) {
+    this.socket = init.socket;
+    this.addReconnectHandler(this.socket);
+    this.id = init.id;
+    this.connectedMessage = init.message || null;
+    this.socketFactory = init.socketFactory;
+    this.maxReconnectRetries = init.maxReconnectRetries || this.maxReconnectRetries;
+  }
+
+  private addReconnectHandler(socket: SocketType) {
+    socket.addEventListener('close', async () => {
+      console.warn(`Socket closed. Attempting to reconnect...`);
+      await this.reconnect();
+    });
+  }
+
+
+  async reconnect() {
+    if (this.isReady() || this.isConnecting()) return;
+    const factory = this.socketFactory;
+    if (!factory) {
+      console.warn(`Unable to connect, no socketFactory was provided`);
+      return;
+    }
+
+    for (let i = 0; i < this.maxReconnectRetries; i++) {
+      console.log(`Reconnect attempt: ${i+1} / ${this.maxReconnectRetries}`);
+      this.socket = factory();
+      await this.wait(3000);
+      if (this.isConnecting()) {
+        await sleep(3000);
+      }
+      if (this.isReady()) {
+        console.log(`OK, connected.`);
+        this.addReconnectHandler(this.socket);
+        return;
+      } 
+      await sleep(500);
+    }
   }
 
   setAuthenticated(authenticated: boolean) {

@@ -1,14 +1,49 @@
 import { BinaryKeyValueStore } from "socker/shared";
 import { SocketImplementation } from "./socket";
+import { sleep } from "./utils";
 export class SocketClient {
     socket;
     connectedMessage = null;
     id;
     authenticated = false;
-    constructor(socket, id, message) {
-        this.socket = socket;
-        this.id = id;
-        this.connectedMessage = message || null;
+    socketFactory;
+    maxReconnectRetries = 32;
+    constructor(init) {
+        this.socket = init.socket;
+        this.addReconnectHandler(this.socket);
+        this.id = init.id;
+        this.connectedMessage = init.message || null;
+        this.socketFactory = init.socketFactory;
+        this.maxReconnectRetries = init.maxReconnectRetries || this.maxReconnectRetries;
+    }
+    addReconnectHandler(socket) {
+        socket.addEventListener('close', async () => {
+            console.warn(`Socket closed. Attempting to reconnect...`);
+            await this.reconnect();
+        });
+    }
+    async reconnect() {
+        if (this.isReady() || this.isConnecting())
+            return;
+        const factory = this.socketFactory;
+        if (!factory) {
+            console.warn(`Unable to connect, no socketFactory was provided`);
+            return;
+        }
+        for (let i = 0; i < this.maxReconnectRetries; i++) {
+            console.log(`Reconnect attempt: ${i + 1} / ${this.maxReconnectRetries}`);
+            this.socket = factory();
+            await this.wait(3000);
+            if (this.isConnecting()) {
+                await sleep(3000);
+            }
+            if (this.isReady()) {
+                console.log(`OK, connected.`);
+                this.addReconnectHandler(this.socket);
+                return;
+            }
+            await sleep(500);
+        }
     }
     setAuthenticated(authenticated) {
         this.authenticated = authenticated;
