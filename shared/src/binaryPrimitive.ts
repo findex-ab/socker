@@ -38,8 +38,8 @@ export class BinaryPrimitive {
     componentType?: EBinaryPrimitiveComponentType
   ) {
     if (!data) return;
-    if (!type) return;
-    if (!componentType) return;
+    if (typeof type !== 'number') return;
+    if (typeof componentType !== 'number') return;
     this.data = data;
     this.type = type;
     this.componentType = componentType;

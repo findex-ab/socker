@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
   ssr: false,
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', "@vueuse/nuxt"],
   alias: {
     "@components": "./components",
     "~shared": fileURLToPath(new URL("../shared", import.meta.url)),

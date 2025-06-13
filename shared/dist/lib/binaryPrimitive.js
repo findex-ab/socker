@@ -27,9 +27,9 @@ export class BinaryPrimitive {
     constructor(data, type, componentType) {
         if (!data)
             return;
-        if (!type)
+        if (typeof type !== 'number')
             return;
-        if (!componentType)
+        if (typeof componentType !== 'number')
             return;
         this.data = data;
         this.type = type;

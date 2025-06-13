@@ -1,5 +1,6 @@
 import { SockerServer } from '../../server';
 import { MyCounterApp } from './apps/counter';
+import { FileUploadApp } from './apps/fileupload';
 
 const main = async () => {
   console.log('hello world');
@@ -8,6 +9,7 @@ const main = async () => {
     port: 44844
   });
   server.use(new MyCounterApp());
+  server.use(new FileUploadApp());
   server.start();
 }
 

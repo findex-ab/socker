@@ -5,8 +5,13 @@ const SOCKET_HOST = 'localhost';
 const SOCKET_URL = `ws://${SOCKET_HOST}:${SOCKET_PORT}`;
 
 
+let socket: SocketClient | null = null;
+
 export const useSocket = () => {
-  return new SocketClient(new WebSocket(SOCKET_URL), '_');
+  if (socket) return socket;
+  const sock = new SocketClient(new WebSocket(SOCKET_URL), '_');
+  socket = sock;
+  return sock;
 }
 //export type ISocketMessage = {
 //  app?: string;
