@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "typings": "./dist/lib/index.d.ts",
+  "module": "./dist/lib/index.js",
+  "main": "./dist/lib/index.js",
+  "scripts": {
+    "build": "tsc --build && tsc-alias",
+    "lint": "prettier ./src --write",
+    "test": "npx tsx --test --experimental-test-module-mocks \"./src/**/*.test.ts\" --report-compact --no-warnings"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.1",
+    "@types/ws": "^8.18.1",
+    "pm2": "^6.0.8",
+    "prettier": "^3.5.3",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.20.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/uuid": "^10.0.0",
+    "uuid": "^11.1.0",
+    "ws": "^8.18.2",
+    "zod": "^3.25.61"
+  }
+}

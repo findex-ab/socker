@@ -1,0 +1,36 @@
+import { WebSocketServer } from "ws";
+import { EventSystem } from "#/shared/eventSystem";
+import { ServerEventMap } from "./serverEvents";
+import { IServerApp, IServerAppMeta } from "./serverApp";
+import { ServerMessageEventHook } from "./hooks";
+import { BasicState, StateSystem } from "#/shared/stateSystem";
+import { SocketClient } from "#/client/client";
+export type SockerServerConfig = {
+    host: string;
+    port: number;
+    httpsCertificatePath?: string;
+};
+export declare class SockerServer {
+    config: SockerServerConfig;
+    socket: WebSocketServer | null;
+    events: EventSystem<ServerEventMap>;
+    apps: Map<string, IServerApp>;
+    appMetas: Map<string, IServerAppMeta>;
+    stateSystem: StateSystem;
+    clientCleanups: Map<string, Set<() => void>>;
+    clients: Map<string, SocketClient>;
+    constructor(config: SockerServerConfig);
+    private onAnyStateEvent;
+    createClientCleanup(clientId: string, fn: () => void): void;
+    runClientCleanups(clientId: string): void;
+    use(app: IServerApp): void;
+    getApp(name: string): IServerApp | null;
+    getAppMeta(name: string): IServerAppMeta | null;
+    getOrCreateAppMeta(name: string): IServerAppMeta;
+    defineMessageHook<T = any>(appName: string, hook: ServerMessageEventHook<T>): void;
+    useClientState<T extends BasicState>(appName: string, clientId: string, init: T): [T, (fn: (old: T) => T) => void];
+    private onAnyEvent;
+    private initApps;
+    private postStart;
+    start(): import("ws").Server<typeof import("ws"), typeof import("http").IncomingMessage>;
+}

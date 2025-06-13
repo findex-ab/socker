@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "outDir": "./dist/lib",
+    "target": "esnext",
+    "declaration": true,
+    "rootDir": "./src",
+    "module": "esnext",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "types": ["node"],
+    "strict": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "paths": {
+      "#/shared/*": ["../shared/src/*"],
+      "#/client/*": ["../client/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "references": [
+    {"path": "../shared"},
+    {"path": "../client"}
+  ] 
+}
