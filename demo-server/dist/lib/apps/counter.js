@@ -1,5 +1,8 @@
 import { EServerEvent } from '../../../server';
 import { z } from 'zod';
+const defaultState = {
+    count: 0
+};
 export class MyCounterApp {
     name = 'counter';
     init(server) {
@@ -11,8 +14,10 @@ export class MyCounterApp {
                     action: z.string()
                 }).parse(store.toJS());
             },
-            callback: (data) => {
-                console.log('Received the increment!', data);
+            callback: (data, ev, server) => {
+                const [state, setState] = server.useClientState(this.name, ev.connection.id, defaultState);
+                setState((state) => ({ ...state, count: state.count + 1 }));
+                console.log('Received the increment!', data, state);
             }
         });
     }
