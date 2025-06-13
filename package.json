@@ -26,19 +26,22 @@
   ],
   "exports": {
     "./shared": {
-      "types": "./shared/dist/lib/index.d.ts",
-      "default": "./shared/dist/lib/index.js",
-      "main": "./shared/dist/lib/index.js"
+      "main": {
+        "types": "./shared/dist/lib/index.d.ts",
+        "default": "./shared/dist/lib/index.js"
+      }
     },
     "./server": {
-      "types": "./server/dist/lib/index.d.ts",
-      "default": "./server/dist/lib/index.js",
-      "main": "./shared/dist/lib/index.js"
+      "main": {
+        "types": "./server/dist/lib/index.d.ts",
+        "default": "./server/dist/lib/index.js"
+      }
     },
     "./client": {
-      "types": "./client/dist/lib/index.d.ts",
-      "default": "./client/dist/lib/index.js",
-      "main": "./shared/dist/lib/index.js"
+      "main": {
+        "types": "./client/dist/lib/index.d.ts",
+        "default": "./client/dist/lib/index.js"
+      }
     }
   },
   "devDependencies": {
