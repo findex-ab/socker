@@ -239,9 +239,15 @@ export class SocketClient {
             }
             return { ok: false };
         }
+        if (resp.get('ok') && resp.getBool('ok') === false) {
+            if (args.onFinish) {
+                args.onFinish(this, false);
+            }
+            return { ...resp.toJS(), ok: false };
+        }
         if (args.onFinish) {
             args.onFinish(this, true);
         }
-        return { ok: true };
+        return { ...resp.toJS(), ok: true };
     }
 }

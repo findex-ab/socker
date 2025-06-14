@@ -14,6 +14,7 @@ export type SocketClientTransferArgs = {
 };
 export type SocketClientTransferResult = {
     ok: boolean;
+    [key: string]: any;
 };
 export type ISocketClientInit = {
     socket: SocketType;
