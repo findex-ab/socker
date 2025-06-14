@@ -15,11 +15,13 @@ export class Transaction {
     uuid;
     outputDir = '/tmp';
     fd = -1;
+    meta;
     constructor(init) {
         this.id = init.id;
         const namespace = '1b671a64-40d5-491e-99b0-da01ff1f3341';
         this.uuid = UUID.v5(init.id, namespace);
         this.outputDir = init.outputDir || this.outputDir;
+        this.meta = init.meta;
     }
     getFilename() {
         return `${this.uuid}.bin`;

@@ -10,9 +10,10 @@ export enum ETransactionState {
   CLOSED = 'CLOSED'
 }
 
-export type ITransactionInit = {
+export type ITransactionInit<MetaData = any> = {
   id: string;
   outputDir?: string;
+  meta?: MetaData
 }
 
 export type ITransactionWriteArgs = {
@@ -20,18 +21,20 @@ export type ITransactionWriteArgs = {
   data: Uint8Array;
 }
 
-export class Transaction {
+export class Transaction<MetaData = any> {
   state: ETransactionState = ETransactionState.NONE;
   id: string;
   uuid: string;
   outputDir: string = '/tmp';
   fd: number = -1;
+  meta?: MetaData
 
-  constructor(init: ITransactionInit) {
+  constructor(init: ITransactionInit<MetaData>) {
     this.id = init.id;
     const namespace = '1b671a64-40d5-491e-99b0-da01ff1f3341';
     this.uuid = UUID.v5(init.id, namespace);
     this.outputDir = init.outputDir || this.outputDir;
+    this.meta = init.meta;
   }
 
   getFilename() {
