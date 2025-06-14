@@ -1,9 +1,2 @@
-export declare const SocketImplementation: {
-    new (url: string | URL, protocols?: string | string[]): WebSocket;
-    prototype: WebSocket;
-    readonly CONNECTING: 0;
-    readonly OPEN: 1;
-    readonly CLOSING: 2;
-    readonly CLOSED: 3;
-};
+export declare const SocketImplementation: any;
 export type SocketType = InstanceType<typeof SocketImplementation>;
