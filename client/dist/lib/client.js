@@ -16,7 +16,9 @@ export class SocketClient {
     events = new EventSystem();
     constructor(init) {
         this.socket = init.socket;
-        this.addReconnectHandler(this.socket);
+        if (init.autoReconnect !== false) {
+            this.addReconnectHandler(this.socket);
+        }
         this.id = init.id;
         this.connectedMessage = init.message || null;
         this.socketFactory = init.socketFactory;

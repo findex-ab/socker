@@ -29,6 +29,7 @@ export type ISocketClientInit = {
   message?: IncomingMessage;
   socketFactory?: () => SocketType;
   maxReconnectRetries?: number;
+  autoReconnect?: boolean;
 }
 
 
@@ -52,7 +53,9 @@ export class SocketClient {
 
   constructor(init: ISocketClientInit) {
     this.socket = init.socket;
-    this.addReconnectHandler(this.socket);
+    if (init.autoReconnect !== false) {
+      this.addReconnectHandler(this.socket);
+    }
     this.id = init.id;
     this.connectedMessage = init.message || null;
     this.socketFactory = init.socketFactory;

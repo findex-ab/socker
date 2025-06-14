@@ -22,6 +22,7 @@ export type ISocketClientInit = {
     message?: IncomingMessage;
     socketFactory?: () => SocketType;
     maxReconnectRetries?: number;
+    autoReconnect?: boolean;
 };
 export declare enum ESocketClientEvent {
     RECONNECTED = "RECONNECTED"
