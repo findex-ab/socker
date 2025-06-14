@@ -5,7 +5,6 @@ export class SocketClient {
     socket;
     connectedMessage = null;
     id;
-    authenticated = false;
     socketFactory;
     maxReconnectRetries = 32;
     constructor(init) {
@@ -44,9 +43,6 @@ export class SocketClient {
             }
             await sleep(500);
         }
-    }
-    setAuthenticated(authenticated) {
-        this.authenticated = authenticated;
     }
     checkSocketAndWarn() {
         if (this.isClosed()) {

@@ -5,6 +5,7 @@ import { IServerApp, IServerAppMeta } from "./serverApp";
 import { ServerMessageEventHook } from "./hooks";
 import { BasicState, StateSystem } from "socker/shared";
 import { SocketClient } from "socker/client";
+import { IClientMeta } from "./client";
 export type SockerServerConfig = {
     host: string;
     port: number;
@@ -19,11 +20,14 @@ export declare class SockerServer {
     stateSystem: StateSystem;
     clientCleanups: Map<string, Set<() => void>>;
     clients: Map<string, SocketClient>;
+    clientMetas: Map<string, IClientMeta>;
     constructor(config: SockerServerConfig);
     private onAnyStateEvent;
     createClientCleanup(clientId: string, fn: () => void): void;
     runClientCleanups(clientId: string): void;
     use(app: IServerApp): void;
+    getClient(id: string): SocketClient | null;
+    getClientMeta(clientId: string): IClientMeta | null;
     getApp(name: string): IServerApp | null;
     getAppMeta(name: string): IServerAppMeta | null;
     getOrCreateAppMeta(name: string): IServerAppMeta;

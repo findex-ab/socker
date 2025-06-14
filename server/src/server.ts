@@ -11,6 +11,7 @@ import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
 import { RawData } from "ws";
 import { AnyStateSystemEvent, BasicState, EStateSystemEvent, StateSystem } from "#/shared/stateSystem";
 import { SocketClient } from "#/client/client";
+import { IClientMeta } from "./client";
 
 export type SockerServerConfig = {
   host: string;
@@ -27,6 +28,7 @@ export class SockerServer {
   stateSystem: StateSystem = new StateSystem();
   clientCleanups: Map<string, Set<() => void>> = new Map();
   clients: Map<string, SocketClient> = new Map();
+  clientMetas: Map<string, IClientMeta> = new Map();
 
   constructor(config: SockerServerConfig) {
     this.config = config;
@@ -82,6 +84,14 @@ export class SockerServer {
 
   use(app: IServerApp) {
     this.apps.set(app.name, app);
+  }
+
+  getClient(id: string): SocketClient | null {
+    return this.clients.get(id) || null;
+  }
+
+  getClientMeta(clientId: string): IClientMeta | null {
+    return this.clientMetas.get(clientId) || null;
   }
 
   getApp(name: string): IServerApp | null {
@@ -214,8 +224,12 @@ export class SockerServer {
         message: req
       });
       this.clients.set(connection.id, connection);
+      this.clientMetas.set(connection.id, {
+        data: new Map()
+      })
       this.createClientCleanup(connection.id, () => {
         this.clients.delete(connection.id);
+        this.clientMetas.delete(connection.id);
       })
       
       this.events.emit({ connection, eventType: EServerEvent.CLIENT_CONNECTION });

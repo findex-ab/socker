@@ -30,7 +30,6 @@ export class SocketClient {
   socket: SocketType;
   connectedMessage: IncomingMessage | null = null;
   id: string;
-  authenticated: boolean = false;
   socketFactory?: () => SocketType;
   maxReconnectRetries: number = 32;
 
@@ -73,10 +72,6 @@ export class SocketClient {
       } 
       await sleep(500);
     }
-  }
-
-  setAuthenticated(authenticated: boolean) {
-    this.authenticated = authenticated;
   }
 
   private checkSocketAndWarn(): boolean {

@@ -24,13 +24,11 @@ export declare class SocketClient {
     socket: SocketType;
     connectedMessage: IncomingMessage | null;
     id: string;
-    authenticated: boolean;
     socketFactory?: () => SocketType;
     maxReconnectRetries: number;
     constructor(init: ISocketClientInit);
     private addReconnectHandler;
     reconnect(): Promise<void>;
-    setAuthenticated(authenticated: boolean): void;
     private checkSocketAndWarn;
     send(data: BinaryKeyValueStore): void;
     isReady(): boolean;

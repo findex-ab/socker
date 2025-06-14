@@ -17,6 +17,7 @@ export class SockerServer {
     stateSystem = new StateSystem();
     clientCleanups = new Map();
     clients = new Map();
+    clientMetas = new Map();
     constructor(config) {
         this.config = config;
         this.events = new EventSystem();
@@ -68,6 +69,12 @@ export class SockerServer {
     }
     use(app) {
         this.apps.set(app.name, app);
+    }
+    getClient(id) {
+        return this.clients.get(id) || null;
+    }
+    getClientMeta(clientId) {
+        return this.clientMetas.get(clientId) || null;
     }
     getApp(name) {
         return this.apps.get(name) || null;
@@ -193,8 +200,12 @@ export class SockerServer {
                 message: req
             });
             this.clients.set(connection.id, connection);
+            this.clientMetas.set(connection.id, {
+                data: new Map()
+            });
             this.createClientCleanup(connection.id, () => {
                 this.clients.delete(connection.id);
+                this.clientMetas.delete(connection.id);
             });
             this.events.emit({ connection, eventType: EServerEvent.CLIENT_CONNECTION });
             socket.addEventListener("open", (ev) => {
