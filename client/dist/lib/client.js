@@ -2,6 +2,7 @@ import { BinaryKeyValueStore } from "socker/shared";
 import { SocketImplementation } from "./socket";
 import { sleep } from "./utils";
 import { EventSystem } from "socker/shared";
+const DEFAULT_TRANSFER_CHUNKSIZE = 1000000; // 1mb
 export var ESocketClientEvent;
 (function (ESocketClientEvent) {
     ESocketClientEvent["RECONNECTED"] = "RECONNECTED";
@@ -211,7 +212,7 @@ export class SocketClient {
             return { ok: false };
         }
         const blob = args.data;
-        const chunkSize = args.chunkSize || 512;
+        const chunkSize = args.chunkSize || DEFAULT_TRANSFER_CHUNKSIZE;
         const numChunks = Math.ceil(blob.size / chunkSize);
         let chunkIndex = 0;
         let bytesSent = 0;

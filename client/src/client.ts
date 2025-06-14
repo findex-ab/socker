@@ -4,6 +4,8 @@ import { SocketImplementation, SocketType } from "./socket";
 import { sleep } from "./utils";
 import { EventSystem } from "#/shared/eventSystem";
 
+const DEFAULT_TRANSFER_CHUNKSIZE: number = 1000000; // 1mb
+
 export type SocketClientMessageCallbackFunction = (data: BinaryKeyValueStore) => any;
 
 export type SocketClientTransferArgs = {
@@ -264,7 +266,7 @@ export class SocketClient {
     }
 
     const blob = args.data;
-    const chunkSize = args.chunkSize || 512;
+    const chunkSize = args.chunkSize || DEFAULT_TRANSFER_CHUNKSIZE;
     const numChunks = Math.ceil(blob.size / chunkSize);
     let chunkIndex: number = 0;
     let bytesSent: number = 0;
