@@ -1,6 +1,6 @@
 {
   "name": "socker",
-  "version": "1.0.9",
+  "version": "1.0.11",
   "description": "",
   "homepage": "https://github.com/findex-ab/socker#readme",
   "bugs": {
@@ -16,7 +16,8 @@
   "scripts": {
     "build": "npm run build -ws && python3 ./fixpaths.py && ./mkpackage.sh && python3 ./fixpaths.py",
     "dev": "pm2-dev --raw ./dev.json",
-    "clean": "rm -rf ./tmp; rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist; rm -rf ./client/dist;"
+    "clean": "rm -rf ./tmp; rm -rf ./server/dist; rm -rf ./demo-server/dist; rm -rf ./shared/dist; rm -rf ./client/dist;",
+    "bump": "python3 ./bump.py && npm run build && npm link && git add --all && git commit -m 'bump' && git push"
   },
   "workspaces": [
     "shared",
