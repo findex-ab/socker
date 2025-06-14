@@ -237,11 +237,12 @@ export class SocketClient {
 
     const buff = await data.arrayBuffer();
     const bytes = new Uint8Array(buff);
+    sock.socket.binaryType = "arraybuffer";
     sock.send(BinaryKeyValueStore.fromJS({
       app: args.app,
       name: args.name,
       action: 'TRANSACTION',
-      chunkIndex: chunkIndex,
+      chunkIndex: chunkIndex >>> 0,
       data: bytes 
     }));
     const resp = await sock.receive({ action: 'TRANSACTION', app: args.app, name: args.name });

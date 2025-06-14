@@ -25,7 +25,7 @@ export class Transaction {
   id: string;
   uuid: string;
   outputDir: string = '/tmp';
-  private fd: number = -1;
+  fd: number = -1;
 
   constructor(init: ITransactionInit) {
     this.id = init.id;
@@ -50,12 +50,12 @@ export class Transaction {
     return this.state === ETransactionState.CLOSED;
   }
   
-  open(mode: string = 'w') {
+  open(mode: string = 'w', filepath?: string) {
     if (this.isOpen()) {
       console.warn('Transaction is already opened.');
       return;
     }
-    this.fd = fs.openSync(this.getFilepath(),  mode);
+    this.fd = fs.openSync(filepath || this.getFilepath(),  mode);
     this.state = ETransactionState.OPEN;
   }
 
@@ -68,8 +68,11 @@ export class Transaction {
       console.warn('Transaction is already closed.');
       return;
     }
-    fs.closeSync(this.fd);
+    if (this.fd !== -1) {
+      fs.closeSync(this.fd);
+    }
     this.state = ETransactionState.CLOSED;
+    this.fd = -1;
   }
 
 

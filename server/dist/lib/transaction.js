@@ -33,12 +33,12 @@ export class Transaction {
     isClosed() {
         return this.state === ETransactionState.CLOSED;
     }
-    open(mode = 'w') {
+    open(mode = 'w', filepath) {
         if (this.isOpen()) {
             console.warn('Transaction is already opened.');
             return;
         }
-        this.fd = fs.openSync(this.getFilepath(), mode);
+        this.fd = fs.openSync(filepath || this.getFilepath(), mode);
         this.state = ETransactionState.OPEN;
     }
     close() {
@@ -50,8 +50,11 @@ export class Transaction {
             console.warn('Transaction is already closed.');
             return;
         }
-        fs.closeSync(this.fd);
+        if (this.fd !== -1) {
+            fs.closeSync(this.fd);
+        }
         this.state = ETransactionState.CLOSED;
+        this.fd = -1;
     }
     write(args) {
         if (!this.isOpen()) {

@@ -17,13 +17,13 @@ export declare class Transaction {
     id: string;
     uuid: string;
     outputDir: string;
-    private fd;
+    fd: number;
     constructor(init: ITransactionInit);
     getFilename(): string;
     getFilepath(): string;
     isOpen(): boolean;
     isClosed(): boolean;
-    open(mode?: string): void;
+    open(mode?: string, filepath?: string): void;
     close(): void;
     write(args: ITransactionWriteArgs): void;
     read(): Generator<BinaryKeyValueStore, void, undefined> | null;
