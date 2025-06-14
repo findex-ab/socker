@@ -28,6 +28,7 @@ export class Transaction<MetaData = any> {
   outputDir: string = '/tmp';
   fd: number = -1;
   meta?: MetaData
+  private dataSize: number = 0;
 
   constructor(init: ITransactionInit<MetaData>) {
     this.id = init.id;
@@ -35,6 +36,10 @@ export class Transaction<MetaData = any> {
     this.uuid = UUID.v5(init.id, namespace);
     this.outputDir = init.outputDir || this.outputDir;
     this.meta = init.meta;
+  }
+
+  getDataSize(): number {
+    return this.dataSize;
   }
 
   getFilename() {
@@ -89,6 +94,7 @@ export class Transaction<MetaData = any> {
     fs.appendFileSync(this.fd, (new BinaryPrimitive()).setString('CHUNK').data, { encoding: 'binary' });
     fs.appendFileSync(this.fd, (new BinaryPrimitive()).setUint32(bin.length).data, { encoding: 'binary' });
     fs.appendFileSync(this.fd, bin, { encoding: 'binary' });
+    this.dataSize += args.data.length;
   }
 
   read(): Generator<BinaryKeyValueStore, void, undefined> | null {

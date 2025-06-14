@@ -20,7 +20,9 @@ export declare class Transaction<MetaData = any> {
     outputDir: string;
     fd: number;
     meta?: MetaData;
+    private dataSize;
     constructor(init: ITransactionInit<MetaData>);
+    getDataSize(): number;
     getFilename(): string;
     getFilepath(): string;
     isOpen(): boolean;
