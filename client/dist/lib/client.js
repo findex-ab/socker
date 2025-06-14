@@ -173,6 +173,7 @@ export class SocketClient {
         if (!sock)
             return false;
         sock.send(BinaryKeyValueStore.fromJS({
+            ...(args.startParams || {}),
             app: args.app,
             name: args.name,
             action: 'TRANSACTION_START'

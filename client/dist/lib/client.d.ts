@@ -7,6 +7,7 @@ export type SocketClientTransferArgs = {
     data: Blob | File;
     name: string;
     app: string;
+    startParams?: Record<string, any>;
     chunkSize?: number;
     onFinish?: (socket: SocketClient, ok: boolean) => any;
     onProgress?: (socket: SocketClient, bytesSent: number, totalBytes: number) => any;

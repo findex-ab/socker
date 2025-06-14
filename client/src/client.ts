@@ -10,6 +10,7 @@ export type SocketClientTransferArgs = {
   data: Blob | File;
   name: string;
   app: string;
+  startParams?: Record<string, any>; 
   chunkSize?: number;
   onFinish?: (socket: SocketClient, ok: boolean) => any;
   onProgress?: (socket: SocketClient, bytesSent: number, totalBytes: number) => any;
@@ -217,6 +218,7 @@ export class SocketClient {
     if (!sock) return false;
 
     sock.send(BinaryKeyValueStore.fromJS({
+      ...(args.startParams || {}),
       app: args.app,
       name: args.name,
       action: 'TRANSACTION_START'
