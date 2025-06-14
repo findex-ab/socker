@@ -11,7 +11,8 @@ export enum EBinaryPrimitiveComponentType {
   FLOAT64 = 6,
   CHAR = 7,
   BYTE = 8,
-  ARB = 9
+  BOOL = 9,
+  ARB = 10
 }
 
 export enum EBinaryPrimitiveType {
@@ -137,6 +138,18 @@ export class BinaryPrimitive {
     return this;
   }
 
+  setBool(value: boolean) {
+    this.type = EBinaryPrimitiveType.SCALAR;
+    this.componentType = EBinaryPrimitiveComponentType.BOOL;
+    this.data = new Uint8Array([value === true ? 1 : 0]);
+    this.size = this.data.length;
+    return this;
+  }
+
+  getBool(): boolean {
+    return this.getByte() >= 1;
+  }
+
   setBytes(data: Uint8Array) {
     this.type = EBinaryPrimitiveType.ARRAY;
     this.componentType = EBinaryPrimitiveComponentType.BYTE;
@@ -149,7 +162,7 @@ export class BinaryPrimitive {
     return this.data;
   }
 
-  getByte() {
+  getByte(): number {
     return this.getPIBuffer().getUint8(0);//this.getBuffer().readUint8();
   } 
 

@@ -11,7 +11,8 @@ export var EBinaryPrimitiveComponentType;
     EBinaryPrimitiveComponentType[EBinaryPrimitiveComponentType["FLOAT64"] = 6] = "FLOAT64";
     EBinaryPrimitiveComponentType[EBinaryPrimitiveComponentType["CHAR"] = 7] = "CHAR";
     EBinaryPrimitiveComponentType[EBinaryPrimitiveComponentType["BYTE"] = 8] = "BYTE";
-    EBinaryPrimitiveComponentType[EBinaryPrimitiveComponentType["ARB"] = 9] = "ARB";
+    EBinaryPrimitiveComponentType[EBinaryPrimitiveComponentType["BOOL"] = 9] = "BOOL";
+    EBinaryPrimitiveComponentType[EBinaryPrimitiveComponentType["ARB"] = 10] = "ARB";
 })(EBinaryPrimitiveComponentType || (EBinaryPrimitiveComponentType = {}));
 export var EBinaryPrimitiveType;
 (function (EBinaryPrimitiveType) {
@@ -113,6 +114,16 @@ export class BinaryPrimitive {
         this.data = new Uint8Array([value]);
         this.size = this.data.length;
         return this;
+    }
+    setBool(value) {
+        this.type = EBinaryPrimitiveType.SCALAR;
+        this.componentType = EBinaryPrimitiveComponentType.BOOL;
+        this.data = new Uint8Array([value === true ? 1 : 0]);
+        this.size = this.data.length;
+        return this;
+    }
+    getBool() {
+        return this.getByte() >= 1;
     }
     setBytes(data) {
         this.type = EBinaryPrimitiveType.ARRAY;

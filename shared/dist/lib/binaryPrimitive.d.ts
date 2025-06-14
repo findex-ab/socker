@@ -8,7 +8,8 @@ export declare enum EBinaryPrimitiveComponentType {
     FLOAT64 = 6,
     CHAR = 7,
     BYTE = 8,
-    ARB = 9
+    BOOL = 9,
+    ARB = 10
 }
 export declare enum EBinaryPrimitiveType {
     SCALAR = 0,
@@ -37,6 +38,8 @@ export declare class BinaryPrimitive {
     setNumber(value: number): this;
     getNumber(): number;
     setByte(value: number): this;
+    setBool(value: boolean): this;
+    getBool(): boolean;
     setBytes(data: Uint8Array): this;
     getBytes(): Uint8Array;
     getByte(): number;

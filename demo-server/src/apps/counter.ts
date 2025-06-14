@@ -23,7 +23,7 @@ export class MyCounterApp implements IServerApp {
           action: z.string()
         }).parse(store.toJS())
       },
-      callback: (data, ev, server) => {
+      callback: (data, ev) => {
         const [state, setState] = server.useClientState(this.name, ev.connection.id, defaultState());
         setState((state) => ({...state, count: state.count + 1}));
         console.log('Received the increment!', data, state);
@@ -37,7 +37,7 @@ export class MyCounterApp implements IServerApp {
           action: z.string()
         }).parse(store.toJS())
       },
-      callback: (data, ev, server) => {
+      callback: (data, ev) => {
         const [state, setState] = server.useClientState(this.name, ev.connection.id, defaultState());
         setState((state) => ({...state, count: state.count - 1}));
         console.log('Received the decrement!', data, state);

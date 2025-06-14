@@ -6,12 +6,18 @@ import { EventSystem } from "#/shared/eventSystem";
 import { AnyServerEvent, EServerEvent, ServerEventMap } from "./serverEvents";
 import { IServerApp, IServerAppMeta } from "./serverApp";
 import { ServerMessageEventHook } from "./hooks";
-import * as UUID from 'uuid';
+import * as UUID from "uuid";
 import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
 import { RawData } from "ws";
-import { AnyStateSystemEvent, BasicState, EStateSystemEvent, StateSystem } from "#/shared/stateSystem";
+import {
+  AnyStateSystemEvent,
+  BasicState,
+  EStateSystemEvent,
+  StateSystem,
+} from "#/shared/stateSystem";
 import { SocketClient } from "#/client/client";
 import { IClientMeta } from "./client";
+import { InternalEventHandler } from "./internalEventHandler";
 
 export type SockerServerConfig = {
   host: string;
@@ -23,6 +29,7 @@ export class SockerServer {
   config: SockerServerConfig;
   socket: WebSocketServer | null = null;
   events: EventSystem<ServerEventMap>;
+  internalEventHandler: InternalEventHandler;
   apps: Map<string, IServerApp> = new Map();
   appMetas: Map<string, IServerAppMeta> = new Map();
   stateSystem: StateSystem = new StateSystem();
@@ -33,30 +40,15 @@ export class SockerServer {
   constructor(config: SockerServerConfig) {
     this.config = config;
     this.events = new EventSystem();
+    this.internalEventHandler = new InternalEventHandler(this);
     this.events.subscribeAll((event) => {
-      this.onAnyEvent(event).catch(e => console.error(e));
+      this.internalEventHandler
+        .handleEvent(event)
+        .catch((e) => console.error(e));
     });
     this.stateSystem.events.subscribeAll((event) => {
-      this.onAnyStateEvent(event);
-    })
-  }
-
-  private onAnyStateEvent(event: AnyStateSystemEvent) {
-    const key = event.key.toString();
-    const parts = key.split('|');
-    const [appName, clientId] = parts;
-    const client = this.clients.get(clientId);
-    if (!client) return;
-    if (event.eventType === EStateSystemEvent.STATE_MERGED) {
-
-      client.send(BinaryKeyValueStore.fromJS({
-        app: appName,
-        action: 'STATE_MERGED',
-        state: event.state
-      }));
-      
-      console.log(`A state event! key=${event.key.toString()}, client: ${typeof client}`);
-    }
+      this.internalEventHandler.handleStateEvent(event);
+    });
   }
 
   createClientCleanup(clientId: string, fn: () => void) {
@@ -68,6 +60,17 @@ export class SockerServer {
   }
 
   runClientCleanups(clientId: string) {
+    this.getClientApps(clientId).forEach((app) => {
+      const client = this.getClient(clientId);
+      if (client && app.cleanup) {
+        try {
+          app.cleanup(client)
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    })
+
     const arrSet = this.clientCleanups.get(clientId);
     if (!arrSet) return;
     arrSet.forEach((fn) => {
@@ -94,6 +97,15 @@ export class SockerServer {
     return this.clientMetas.get(clientId) || null;
   }
 
+  getClientApps(clientId: string): Array<IServerApp> {
+    return Array.from(this.appMetas.entries())
+      .filter(([_appName, meta]) =>
+        Array.from(meta.connectedClients.values()).includes(clientId),
+      )
+      .map(([appName, _meta]) => this.getApp(appName))
+      .filter((it) => it !== null);
+  }
+
   getApp(name: string): IServerApp | null {
     return this.apps.get(name) || null;
   }
@@ -107,8 +119,8 @@ export class SockerServer {
     if (meta) return meta;
     const appMeta: IServerAppMeta = {
       hooks: new Map(),
-      connectedClients: new Set()
-    }
+      connectedClients: new Set(),
+    };
     this.appMetas.set(name, appMeta);
     return appMeta;
   }
@@ -125,70 +137,36 @@ export class SockerServer {
   useClientState<T extends BasicState>(
     appName: string,
     clientId: string,
-    init: T
+    init: T,
   ) {
     const key = `${appName}|${clientId}`;
     this.createClientCleanup(clientId, () => {
       console.log(`Deleting state: ${key}`);
       this.stateSystem.deleteState(key);
-    })
+    });
     return this.stateSystem.useState<T>(key, init);
   }
 
-  private async onAnyEvent(event: AnyServerEvent) {
-    console.log(`EVENT`, event.eventType);
-    switch (event.eventType) {
-      case EServerEvent.CLIENT_MESSAGE: {
-        console.log(event.data);
-        const appName = event.data.getString('app');
-        console.log({ appName });
-        if (appName) {
-          const app = this.getApp(appName);
-          if (app) {
-            if (app.onEvent) {
-              try {
-                app.onEvent(event, this);
-              } catch (e) {
-                console.error(e);
-              }
-            }
-            if (app.onMessage) {
-              try {
-                app.onMessage(event.data, event.connection, this);
-              } catch (e) {
-                console.error(e);
-              }
-            }
-          }
-          const meta = this.getOrCreateAppMeta(appName);
+  getAllClients(): Array<SocketClient> {
+    return Array.from(this.clients.values());
+  }
 
-          if (!meta.connectedClients.has(event.connection.id)) {
-            meta.connectedClients.add(event.connection.id);
-            this.createClientCleanup(event.connection.id, () => {
-              meta.connectedClients.delete(event.connection.id);
-            });
-          }
-          
-          const action = event.data.getString('action');
-          if (action) {
-            const hookSet = meta.hooks.get(action);
-            if (hookSet) {
-              hookSet.forEach((hook) => {
-                try {
-                  const data = hook.parse(event.data);
-                  hook.callback(data, event, this);
-                } catch (e) {
-                  console.error(e);
-                }
-              })
-            }
-          }
-        }
-      }; break;
-      case EServerEvent.CLIENT_CLOSE: {
-        this.runClientCleanups(event.connection.id);
-      }; break;
-    }
+  getClientsInApp(appName: string): Array<SocketClient> {
+    const appMeta = this.getAppMeta(appName);
+    if (!appMeta) return [];
+    return Array.from(appMeta.connectedClients.values())
+      .map((clientId) => this.getClient(clientId))
+      .filter((it) => it !== null);
+  }
+
+  broadcast(message: BinaryKeyValueStore) {
+    const appName = message.getString("app");
+    const clients = appName
+      ? this.getClientsInApp(appName)
+      : this.getAllClients();
+    clients.forEach((client) => {
+      client.send(message);
+    });
   }
 
   private async initApps() {
@@ -200,45 +178,55 @@ export class SockerServer {
   }
 
   private postStart(server: WebSocketServer) {
-    server.addListener('listening', async () => {
+    server.addListener("listening", async () => {
       await this.initApps();
     });
 
-    server.addListener('headers', (headers, req) => {
+    server.addListener("headers", (headers, req) => {
       this.events.emit({
         headers: headers,
         request: req,
-        eventType: EServerEvent.RECEIVED_HEADERS
-      })
+        eventType: EServerEvent.RECEIVED_HEADERS,
+        server: this,
+      });
     });
 
-    server.addListener('error', (err) => {
-      this.events.emit({ error: err, eventType: EServerEvent.SERVER_ERROR });
+    server.addListener("error", (err) => {
+      this.events.emit({
+        error: err,
+        eventType: EServerEvent.SERVER_ERROR,
+        server: this,
+      });
     });
-    
+
     server.addListener("connection", (socket, req) => {
       const id = UUID.v4();
       const connection = new SocketClient({
         socket: socket as unknown as any,
         id: id,
-        message: req
+        message: req,
       });
       this.clients.set(connection.id, connection);
       this.clientMetas.set(connection.id, {
-        data: new Map()
-      })
+        data: new Map(),
+      });
       this.createClientCleanup(connection.id, () => {
         this.clients.delete(connection.id);
         this.clientMetas.delete(connection.id);
-      })
-      
-      this.events.emit({ connection, eventType: EServerEvent.CLIENT_CONNECTION });
+      });
+
+      this.events.emit({
+        connection,
+        eventType: EServerEvent.CLIENT_CONNECTION,
+        server: this,
+      });
 
       socket.addEventListener("open", (ev) => {
         this.events.emit({
           connection,
           type: ev.type,
-          eventType: EServerEvent.CLIENT_OPEN
+          eventType: EServerEvent.CLIENT_OPEN,
+          server: this,
         });
       });
 
@@ -248,51 +236,60 @@ export class SockerServer {
           type: ev.type,
           reason: ev.reason,
           code: ev.code,
-          eventType: EServerEvent.CLIENT_CLOSE
+          eventType: EServerEvent.CLIENT_CLOSE,
+          server: this,
         });
       });
 
-      socket.addEventListener('error', (ev) => {
+      socket.addEventListener("error", (ev) => {
         this.events.emit({
           connection,
           type: ev.type,
           error: ev.error,
           message: ev.message,
-          eventType: EServerEvent.CLIENT_ERROR
+          eventType: EServerEvent.CLIENT_ERROR,
+          server: this,
         });
       });
 
-      socket.on('message', (data, isBinary) => {
+      socket.on("message", (data, isBinary) => {
         const convert = (x: RawData | number[]) => {
-          if (x instanceof ArrayBuffer || x instanceof Uint8Array || x instanceof SharedArrayBuffer) return x;
+          if (
+            x instanceof ArrayBuffer ||
+            x instanceof Uint8Array ||
+            x instanceof SharedArrayBuffer
+          )
+            return x;
           if (Array.isArray(x)) {
             if (x.length <= 0) return null;
-            if (typeof x[0] === 'number') return new Uint8Array(x as number[]);
+            if (typeof x[0] === "number") return new Uint8Array(x as number[]);
           }
           return null;
-        }
+        };
         const converted = convert(data);
 
         if (converted === null) {
-          console.error('Invalid message data');
+          console.error("Invalid message data");
           return;
         }
-        
+
         this.events.emit({
           connection,
           data: BinaryKeyValueStore.fromBinary(converted),
           isBinary: isBinary,
-          eventType: EServerEvent.CLIENT_MESSAGE
-        })
+          eventType: EServerEvent.CLIENT_MESSAGE,
+          server: this,
+        });
       });
 
-      socket.on('upgrade', (req) => {
+      socket.on("upgrade", (req) => {
         this.events.emit({
           connection,
           message: req,
-          eventType: EServerEvent.CLIENT_UPGRADE
-        })
-      })
+          eventType: EServerEvent.CLIENT_UPGRADE,
+          server: this,
+        });
+      });
     });
   }
 

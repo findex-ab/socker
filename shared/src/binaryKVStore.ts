@@ -1,11 +1,58 @@
-import { BinaryPrimitive, EBinaryPrimitiveComponentType, EBinaryPrimitiveType } from "./binaryPrimitive";
+import {
+  BinaryPrimitive,
+  EBinaryPrimitiveComponentType,
+  EBinaryPrimitiveType,
+} from "./binaryPrimitive";
 import { DynamicBuffer } from "./dynamicBuffer";
-import { isFloat, isInt, isUint } from "./is";
+import { isFloat, isInt, isStringArray, isUint } from "./is";
 
 export type BinaryKeyValueStoreValue = BinaryPrimitive;
 
 const MAGIC = "BinaryKeyValueStore";
 const TAG = 0x5184;
+const STRING_TAG = 0x5591;
+const STRING_ARRAY_TAG = 0x5593;
+
+const stringArrayFromBinary = (data: BinaryPrimitive): Array<string> => {
+  const buff = new DynamicBuffer(data.data);
+  const numStrings = buff.readUint32();
+  const strings: Array<string> = [];
+  for (let i = 0; i < numStrings; i++) {
+    const strLen = buff.readUint32();
+    if (strLen <= 0) continue;
+    const strContent = buff.readString(strLen);
+    strings.push(strContent);
+  }
+  return strings;
+};
+
+const stringArrayToBinary = (arr: string[]): BinaryPrimitive => {
+  const strings = arr.map((val: string) => {
+    const lengthPrim = new BinaryPrimitive().setUint32(val.length);
+    const contentPrim = new BinaryPrimitive().setString(val);
+    const buff = new DynamicBuffer();
+    buff.write(lengthPrim.data);
+    buff.write(contentPrim.data);
+    return new BinaryPrimitive()
+      .setBytes(buff.data)
+      .setTag(STRING_TAG)
+      .setType(EBinaryPrimitiveType.ARRAY)
+      .setComponentType(EBinaryPrimitiveComponentType.BYTE).data;
+  });
+
+  const buff = new DynamicBuffer();
+  buff.writeUint32(strings.length);
+  for (const str of strings) {
+    buff.write(str);
+  }
+
+  const prim = new BinaryPrimitive()
+    .setTag(STRING_ARRAY_TAG)
+    .setBytes(buff.data)
+    .setType(EBinaryPrimitiveType.ARRAY)
+    .setComponentType(EBinaryPrimitiveComponentType.BYTE);
+  return prim;
+};
 
 export type BinaryKeyValueStoreRow = {
   key: string;
@@ -47,6 +94,11 @@ export class BinaryKeyValueStore {
     this.set(key, new BinaryPrimitive().setString(value));
   }
 
+  setStringArray(key: string, value: Array<string>) {
+    const bin = stringArrayToBinary(value);
+    this.set(key, bin);
+  }
+
   setFloat32(key: string, value: number) {
     this.set(key, new BinaryPrimitive().setFloat32(value));
   }
@@ -72,11 +124,36 @@ export class BinaryKeyValueStore {
   }
 
   setBytes(key: string, value: Uint8Array) {
-    this.set(key, new BinaryPrimitive(value, EBinaryPrimitiveType.ARRAY, EBinaryPrimitiveComponentType.BYTE));
+    this.set(
+      key,
+      new BinaryPrimitive(
+        value,
+        EBinaryPrimitiveType.ARRAY,
+        EBinaryPrimitiveComponentType.BYTE,
+      ),
+    );
+  }
+
+  setBool(key: string, value: boolean) {
+    this.set(key, new BinaryPrimitive().setBool(value));
+  }
+
+  getBool(key: string): boolean {
+    const value = this.get(key);
+    if (value === null) return false;
+    if (value.componentType !== EBinaryPrimitiveComponentType.BOOL) return false;
+    return value.getBool();
   }
 
   setKeyValueStore(key: string, value: BinaryKeyValueStore) {
-    this.set(key, new BinaryPrimitive(value.toBinary(), EBinaryPrimitiveType.ARRAY, EBinaryPrimitiveComponentType.BYTE).setTag(TAG));
+    this.set(
+      key,
+      new BinaryPrimitive(
+        value.toBinary(),
+        EBinaryPrimitiveType.ARRAY,
+        EBinaryPrimitiveComponentType.BYTE,
+      ).setTag(TAG),
+    );
   }
 
   get(key: string): BinaryKeyValueStoreValue | null {
@@ -89,6 +166,13 @@ export class BinaryKeyValueStore {
     const value = this.get(key);
     if (!value) return null;
     return value.getString();
+  }
+
+  getStringArray(key: string): Array<string> {
+    const value = this.get(key);
+    if (!value) return [];
+    if (value.tag !== STRING_ARRAY_TAG) return [];
+    return stringArrayFromBinary(value); 
   }
 
   getFloat32(key: string): number {
@@ -182,7 +266,18 @@ export class BinaryKeyValueStore {
     const kv = new BinaryKeyValueStore();
 
     for (const [key, value] of Object.entries(obj)) {
+      if (Array.isArray(value)) {
+        if (isStringArray(value)) {
+          kv.set(key, stringArrayToBinary(value));
+          continue;
+        }
+      }
+
       switch (typeof value) {
+        case 'boolean': {
+          kv.setBool(key, value);
+          continue;
+        };
         case "number": {
           if (isFloat(value)) {
             kv.setFloat32(key, value);
@@ -202,8 +297,8 @@ export class BinaryKeyValueStore {
         case "string": {
           kv.setString(key, value);
           continue;
-        };
-        case 'object': {
+        }
+        case "object": {
           if (value instanceof Uint8Array) {
             kv.setBytes(key, value);
             continue;
@@ -213,12 +308,13 @@ export class BinaryKeyValueStore {
             continue;
           }
           const keys = Object.keys(value);
-          const isStrings = keys.filter(it => typeof it === 'string').length >= keys.length;
+          const isStrings =
+            keys.filter((it) => typeof it === "string").length >= keys.length;
           if (isStrings) {
             kv.setKeyValueStore(key, this.fromJS(value));
             continue;
           }
-        };
+        }
         default: {
           console.warn(
             `Unsupported type: "${typeof value}", ${key} = ${value}`,
@@ -234,46 +330,77 @@ export class BinaryKeyValueStore {
     const data: Record<string, any> = {};
 
     for (const row of this.rows) {
+      /*
+        const strings = value.map((val: string) => {
+            const lengthPrim = (new BinaryPrimitive()).setUint32(val.length);
+            const contentPrim = (new BinaryPrimitive()).setString(val);
+            const buff = new DynamicBuffer();
+            buff.write(lengthPrim.data);
+            buff.write(contentPrim.data);
+            return ((new BinaryPrimitive()).setBytes(buff.data).setTag(STRING_TAG).setType(EBinaryPrimitiveType.ARRAY).setComponentType(EBinaryPrimitiveComponentType.BYTE)).data;
+          });
+
+          const buff = new DynamicBuffer();
+          buff.writeUint32(strings.length);
+          for (const str of strings) {
+            buff.write(str);
+          }
+
+          const prim = (new BinaryPrimitive()).setTag(STRING_ARRAY_TAG).setBytes(buff.data).setType(EBinaryPrimitiveType.ARRAY).setComponentType(EBinaryPrimitiveComponentType.BYTE);
+          kv.set(key, prim);
+       */
 
       if (row.value.type === EBinaryPrimitiveType.ARRAY) {
-        switch(row.value.componentType) {
-          case EBinaryPrimitiveComponentType.CHAR: {
-            data[row.key] = row.value.getString();
-          } break;
-          case EBinaryPrimitiveComponentType.BYTE: {
-            if (row.value.tag === TAG) {
-              const bytes = row.value.getBytes();
-              const store = BinaryKeyValueStore.fromBinarySafe(bytes);
-              if (store) {
-                data[row.key] = store.toJS();
-              }
-            } else {
-              data[row.key] = row.value.getBytes();
+        switch (row.value.componentType) {
+          case EBinaryPrimitiveComponentType.CHAR:
+            {
+              data[row.key] = row.value.getString();
             }
-          }; break;
+            break;
+          case EBinaryPrimitiveComponentType.BYTE:
+            {
+              if (row.value.tag === TAG) {
+                const bytes = row.value.getBytes();
+                const store = BinaryKeyValueStore.fromBinarySafe(bytes);
+                if (store) {
+                  data[row.key] = store.toJS();
+                }
+              } else if (row.value.tag === STRING_ARRAY_TAG) {
+                data[row.key] = stringArrayFromBinary(row.value);
+              } else {
+                data[row.key] = row.value.getBytes();
+              }
+            }
+            break;
           case EBinaryPrimitiveComponentType.FLOAT32:
           case EBinaryPrimitiveComponentType.UINT32:
-          case EBinaryPrimitiveComponentType.INT32: {
-            data[row.key] = row.value.getArray().map(it => it.getNumber());
-          } break;
+          case EBinaryPrimitiveComponentType.INT32:
+            {
+              data[row.key] = row.value.getArray().map((it) => it.getNumber());
+            }
+            break;
         }
         continue;
       }
-      
+
       switch (row.value.componentType) {
+        case EBinaryPrimitiveComponentType.BOOL: {
+          data[row.key] = row.value.getBool();
+          continue;
+        };
         case EBinaryPrimitiveComponentType.INT32:
         case EBinaryPrimitiveComponentType.FLOAT32:
         case EBinaryPrimitiveComponentType.UINT32: {
           data[row.key] = row.value.getNumber();
           continue;
-        };
+        }
         case EBinaryPrimitiveComponentType.CHAR: {
           data[row.key] = row.value.getChar();
           continue;
-        };
+        }
         default: {
           console.warn(`Unsupported type: "${row.value.type}", ${row.key}`);
-        };
+        }
       }
     }
 

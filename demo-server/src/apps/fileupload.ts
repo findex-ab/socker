@@ -29,7 +29,7 @@ export class FileUploadApp implements IServerApp {
           name: z.string()
         }).parse(data.toJS())
       },
-      callback: (data, event, _server) => {
+      callback: (data, event) => {
         const transId = getTransactionId(event.connection.id, data.name);
         console.log(`Transaction started: ${transId}`);
         this.getOrCreateTransaction(transId).open();
@@ -49,7 +49,7 @@ export class FileUploadApp implements IServerApp {
           data: z.custom<Uint8Array>((value) => value instanceof Uint8Array)
         }).parse(data.toJS())
       },
-      callback: (data, event, _server) => {
+      callback: (data, event) => {
         const transId = getTransactionId(event.connection.id, data.name);
         console.log(`Transaction: ${transId}`);
         const trans = this.getOrCreateTransaction(transId);
@@ -71,7 +71,7 @@ export class FileUploadApp implements IServerApp {
           name: z.string()
         }).parse(data.toJS())
       },
-      callback: (data, event, _server) => {
+      callback: (data, event) => {
         const transId = getTransactionId(event.connection.id, data.name);
         console.log(`Transaction ended: ${transId}`);
         const trans = this.getOrCreateTransaction(transId);
