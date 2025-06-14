@@ -93,6 +93,32 @@ export class SockerServer {
     return this.clients.get(id) || null;
   }
 
+  findClientsByMeta(meta: Record<PropertyKey, any>): Array<SocketClient> {
+    const matchesMeta = (metaMap: Map<PropertyKey, any>): boolean => {
+      for (const [key, value] of Object.entries(meta)) {
+        if (metaMap.get(key) !== value) return false;
+      }
+      return true;
+    }
+    return this.getAllClients().filter((client) => {
+      const clientMeta = this.getClientMeta(client.id)!;
+      return matchesMeta(clientMeta.data);
+    })
+  }
+
+  findClientByMeta(meta: Record<PropertyKey, any>): SocketClient | null {
+    const matchesMeta = (metaMap: Map<PropertyKey, any>): boolean => {
+      for (const [key, value] of Object.entries(meta)) {
+        if (metaMap.get(key) !== value) return false;
+      }
+      return true;
+    }
+    return this.getAllClients().find((client) => {
+      const clientMeta = this.getClientMeta(client.id)!;
+      return matchesMeta(clientMeta.data);
+    }) || null;
+  }
+
   getClientMeta(clientId: string): IClientMeta | null {
     return this.clientMetas.get(clientId) || null;
   }

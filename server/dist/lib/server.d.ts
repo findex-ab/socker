@@ -29,6 +29,8 @@ export declare class SockerServer {
     runClientCleanups(clientId: string): void;
     use(app: IServerApp): void;
     getClient(id: string): SocketClient | null;
+    findClientsByMeta(meta: Record<PropertyKey, any>): Array<SocketClient>;
+    findClientByMeta(meta: Record<PropertyKey, any>): SocketClient | null;
     getClientMeta(clientId: string): IClientMeta | null;
     getClientApps(clientId: string): Array<IServerApp>;
     getApp(name: string): IServerApp | null;
