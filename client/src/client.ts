@@ -2,6 +2,7 @@ import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
 import { IncomingMessage } from "http";
 import { SocketImplementation, SocketType } from "./socket";
 import { sleep } from "./utils";
+import { EventSystem } from "#/shared/eventSystem";
 
 export type SocketClientMessageCallbackFunction = (data: BinaryKeyValueStore) => any;
 
@@ -26,12 +27,24 @@ export type ISocketClientInit = {
   maxReconnectRetries?: number;
 }
 
+
+export enum ESocketClientEvent {
+  RECONNECTED = 'RECONNECTED'
+}
+
+export type SocketClientEventMap = {
+  [ESocketClientEvent.RECONNECTED]: {
+    eventType: ESocketClientEvent.RECONNECTED
+  }
+}
+
 export class SocketClient {
   socket: SocketType;
   connectedMessage: IncomingMessage | null = null;
   id: string;
   socketFactory?: () => SocketType;
   maxReconnectRetries: number = 32;
+  events: EventSystem<SocketClientEventMap> = new EventSystem()
 
   constructor(init: ISocketClientInit) {
     this.socket = init.socket;
@@ -68,6 +81,9 @@ export class SocketClient {
       if (this.isReady()) {
         console.log(`OK, connected.`);
         this.addReconnectHandler(this.socket);
+        this.events.emit({
+          eventType: ESocketClientEvent.RECONNECTED
+        });
         return;
       } 
       await sleep(500);

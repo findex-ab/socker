@@ -1,12 +1,18 @@
 import { BinaryKeyValueStore } from "socker/shared";
 import { SocketImplementation } from "./socket";
 import { sleep } from "./utils";
+import { EventSystem } from "socker/shared";
+export var ESocketClientEvent;
+(function (ESocketClientEvent) {
+    ESocketClientEvent["RECONNECTED"] = "RECONNECTED";
+})(ESocketClientEvent || (ESocketClientEvent = {}));
 export class SocketClient {
     socket;
     connectedMessage = null;
     id;
     socketFactory;
     maxReconnectRetries = 32;
+    events = new EventSystem();
     constructor(init) {
         this.socket = init.socket;
         this.addReconnectHandler(this.socket);
@@ -39,6 +45,9 @@ export class SocketClient {
             if (this.isReady()) {
                 console.log(`OK, connected.`);
                 this.addReconnectHandler(this.socket);
+                this.events.emit({
+                    eventType: ESocketClientEvent.RECONNECTED
+                });
                 return;
             }
             await sleep(500);

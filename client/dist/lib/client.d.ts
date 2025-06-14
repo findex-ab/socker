@@ -1,6 +1,7 @@
 import { BinaryKeyValueStore } from "socker/shared";
 import { IncomingMessage } from "http";
 import { SocketType } from "./socket";
+import { EventSystem } from "socker/shared";
 export type SocketClientMessageCallbackFunction = (data: BinaryKeyValueStore) => any;
 export type SocketClientTransferArgs = {
     data: Blob | File;
@@ -20,12 +21,21 @@ export type ISocketClientInit = {
     socketFactory?: () => SocketType;
     maxReconnectRetries?: number;
 };
+export declare enum ESocketClientEvent {
+    RECONNECTED = "RECONNECTED"
+}
+export type SocketClientEventMap = {
+    [ESocketClientEvent.RECONNECTED]: {
+        eventType: ESocketClientEvent.RECONNECTED;
+    };
+};
 export declare class SocketClient {
     socket: SocketType;
     connectedMessage: IncomingMessage | null;
     id: string;
     socketFactory?: () => SocketType;
     maxReconnectRetries: number;
+    events: EventSystem<SocketClientEventMap>;
     constructor(init: ISocketClientInit);
     private addReconnectHandler;
     reconnect(): Promise<void>;
