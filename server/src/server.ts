@@ -253,18 +253,13 @@ export class SockerServer {
       });
 
       socket.on("message", (data, isBinary) => {
-        const convert = (x: RawData | number[]) => {
-          if (
-            x instanceof ArrayBuffer ||
-            x instanceof Uint8Array ||
-            x instanceof SharedArrayBuffer
-          )
+        const convert = (x: any) => {
+          try {
+            return new Uint8Array(x);
+          } catch (e) {
+            console.error(e);
             return x;
-          if (Array.isArray(x)) {
-            if (x.length <= 0) return null;
-            if (typeof x[0] === "number") return new Uint8Array(x as number[]);
           }
-          return null;
         };
         const converted = convert(data);
 

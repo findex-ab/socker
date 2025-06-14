@@ -1,6 +1,7 @@
 import { describe } from "node:test";
 import { BinaryKeyValueStore } from "./binaryKVStore";
 import assert from "node:assert";
+import fs from 'fs';
 describe("To binary and back", () => {
     const kv = new BinaryKeyValueStore();
     kv.setString("firstname", "john");
@@ -80,4 +81,17 @@ describe("From JS and back", () => {
     assert.strictEqual(data["state"]["count"], 10);
     assert.strictEqual(data["isAdmin"], true);
     assert.strictEqual(data["isKing"], false);
+});
+describe("To a file and back", () => {
+    const kv = BinaryKeyValueStore.fromJS({
+        firstname: 'john',
+        lastname: 'doe',
+        age: 5018
+    });
+    const binary = kv.toBinary();
+    const filepath = '/tmp/kv.bin';
+    fs.writeFileSync(filepath, binary);
+    const fileContents = fs.readFileSync(filepath);
+    const back = BinaryKeyValueStore.fromBinary(fileContents);
+    console.log(back.getNumber('age'));
 });

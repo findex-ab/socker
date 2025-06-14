@@ -185,7 +185,7 @@ export class BinaryKeyValueStore {
         return buff.data;
     }
     static fromBinary(data) {
-        const buff = new DynamicBuffer(data);
+        const buff = new DynamicBuffer(new Uint8Array(data));
         const kv = new BinaryKeyValueStore();
         buff.seek(0);
         const magic = buff.readString(MAGIC.length);

@@ -226,8 +226,8 @@ export class BinaryKeyValueStore {
     return buff.data;
   }
 
-  static fromBinary(data: ArrayBufferLike): BinaryKeyValueStore {
-    const buff = new DynamicBuffer(data);
+  static fromBinary(data: ArrayBufferLike | NonSharedBuffer): BinaryKeyValueStore {
+    const buff = new DynamicBuffer(new Uint8Array(data));
     const kv = new BinaryKeyValueStore();
 
     buff.seek(0);

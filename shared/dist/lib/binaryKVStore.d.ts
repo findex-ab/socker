@@ -31,7 +31,7 @@ export declare class BinaryKeyValueStore {
     getBytes(key: string): Uint8Array | null;
     getKeyValueStore(key: string): BinaryKeyValueStore | null;
     toBinary(): Uint8Array;
-    static fromBinary(data: ArrayBufferLike): BinaryKeyValueStore;
+    static fromBinary(data: ArrayBufferLike | NonSharedBuffer): BinaryKeyValueStore;
     static fromBinarySafe(data: ArrayBufferLike): BinaryKeyValueStore | null;
     static fromJS(obj: Record<string, any>): BinaryKeyValueStore;
     toJS(): Record<string, any>;

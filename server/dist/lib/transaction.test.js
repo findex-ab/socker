@@ -13,7 +13,10 @@ describe("Stuff", () => {
     if (gen) {
         let i = 0;
         for (const chunk of gen) {
-            const chunkIndex = chunk.getNumber("chunkIndex");
+            for (const row of chunk.rows) {
+                console.log(row);
+            }
+            const chunkIndex = chunk.getUint32("chunkIndex");
             const data = chunk.getBytes("data");
             if (!data) {
                 console.error("No data in chunk.");

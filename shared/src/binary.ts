@@ -1,7 +1,7 @@
 import { range } from "./arrays"
 
 export const unpackNumber = (x: number, numBytes: number): number[] => {
-  return range(numBytes).map(i => (x >> (i * 4)) & 0xFF)
+  return range(numBytes).map(i => (x >> (i * numBytes)) & 0xFF)
 }
 
 export const packNumber = (bytes: number[]): number => {

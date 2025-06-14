@@ -211,17 +211,13 @@ export class SockerServer {
             });
             socket.on("message", (data, isBinary) => {
                 const convert = (x) => {
-                    if (x instanceof ArrayBuffer ||
-                        x instanceof Uint8Array ||
-                        x instanceof SharedArrayBuffer)
-                        return x;
-                    if (Array.isArray(x)) {
-                        if (x.length <= 0)
-                            return null;
-                        if (typeof x[0] === "number")
-                            return new Uint8Array(x);
+                    try {
+                        return new Uint8Array(x);
                     }
-                    return null;
+                    catch (e) {
+                        console.error(e);
+                        return x;
+                    }
                 };
                 const converted = convert(data);
                 if (converted === null) {
