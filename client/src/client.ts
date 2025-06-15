@@ -20,6 +20,7 @@ export type SocketClientTransferArgs = {
 
 export type SocketClientTransferResult = {
   ok: boolean;
+  canceled?: boolean;
   [key: string]: any;
 }
 
@@ -32,6 +33,9 @@ export type ISocketClientInit = {
   autoReconnect?: boolean;
 }
 
+export type SocketClientTransactionState = {
+  canceled: boolean;
+}
 
 export enum ESocketClientEvent {
   RECONNECTED = 'RECONNECTED'
@@ -49,7 +53,8 @@ export class SocketClient {
   id: string;
   socketFactory?: () => SocketType;
   maxReconnectRetries: number = 32;
-  events: EventSystem<SocketClientEventMap> = new EventSystem()
+  events: EventSystem<SocketClientEventMap> = new EventSystem();
+  transactionStates: Map<string, SocketClientTransactionState> = new Map();
 
   constructor(init: ISocketClientInit) {
     this.socket = init.socket;
@@ -218,7 +223,40 @@ export class SocketClient {
       })
     })
   }
-  
+
+
+  /////////////////// Transactions
+  private createTransactionState(name: string) {
+    this.transactionStates.set(name, {
+      canceled: false
+    })
+  }
+
+  private transactionIsCanceled(name: string) {
+    const state = this.transactionStates.get(name);
+    if (!state) return true;
+    if (state.canceled) return true;
+    return false;
+  }
+
+  private deleteTransactionState(name: string) {
+    this.transactionStates.delete(name);
+  }
+
+  cancelTransaction(name: string) {
+    const state = this.transactionStates.get(name);
+    if (!state) return;
+    state.canceled = true;
+    this.deleteTransactionState(name);
+  }
+
+  private async withTransactionState<T = any>(name: string, fn: () => Promise<T>): Promise<T> {
+    this.createTransactionState(name);
+    const resp = await fn();
+    this.deleteTransactionState(name);
+    return resp;
+  }
+
   private async startTransaction(args: SocketClientTransferArgs): Promise<boolean> {
     const sock = await this.wait();
     if (!sock) return false;
@@ -259,14 +297,27 @@ export class SocketClient {
     return true;
   }
 
-  async transfer(args: SocketClientTransferArgs): Promise<SocketClientTransferResult> {
-    const startOk = await this.startTransaction(args);
-    if (!startOk) {
+  private async _transfer(args: SocketClientTransferArgs): Promise<SocketClientTransferResult> {
+    const finishWithStatus = (resp: SocketClientTransferResult) => {
       if (args.onFinish) {
-        args.onFinish(this, false);
+        args.onFinish(this, resp.ok);
       }
-      return { ok: false };
+
+      if (resp.canceled) {
+        this.send(BinaryKeyValueStore.fromJS({
+          app: args.app,
+          name: args.name,
+          action: 'TRANSACTION_CANCEL'
+        }))
+      }
+
+      return resp;
     }
+
+    
+    const startOk = await this.startTransaction(args);
+    if (!startOk) return finishWithStatus({ ok: false });
+    if (this.transactionIsCanceled(args.name)) return finishWithStatus({ ok: false, canceled: true });
 
     const blob = args.data;
     const chunkSize = args.chunkSize || DEFAULT_TRANSFER_CHUNKSIZE;
@@ -278,7 +329,8 @@ export class SocketClient {
       const offset = chunkIndex * chunkSize;
       const part = blob.slice(offset, offset + chunkSize);
       const ok = await this.sendTransactionChunk(args, part, chunkIndex);
-      if (!ok) return { ok: false };
+      if (!ok) return finishWithStatus({ ok: false });
+      if (this.transactionIsCanceled(args.name)) return finishWithStatus({ ok: false, canceled: true });
       
       chunkIndex++;
       bytesSent += part.size;
@@ -294,24 +346,18 @@ export class SocketClient {
       name: args.name
     }))
     const resp = await this.receive({ action: 'TRANSACTION_END', app: args.app, name: args.name }, 10000);
-    if (!resp) {
-      if (args.onFinish) {
-        args.onFinish(this, false);
-      }
-      return { ok: false };
-    }
+    if (!resp) return finishWithStatus({ ok: false });
 
     if (resp.get('ok') && resp.getBool('ok') === false) {
-      if (args.onFinish) {
-        args.onFinish(this, false);
-      }
-      return { ...resp.toJS(), ok: false };
+      return finishWithStatus({ ...resp.toJS(), ok: false });
     }
 
-    if (args.onFinish) {
-      args.onFinish(this, true);
-    }
+    return finishWithStatus({ ...resp.toJS(), ok: true });
+  }
 
-    return { ...resp.toJS(), ok: true };
+  async transfer(args: SocketClientTransferArgs): Promise<SocketClientTransferResult> {
+    return await this.withTransactionState(args.name, async () => {
+      return await this._transfer(args);
+    })
   }
 }

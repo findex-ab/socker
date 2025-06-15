@@ -14,6 +14,7 @@ export type SocketClientTransferArgs = {
 };
 export type SocketClientTransferResult = {
     ok: boolean;
+    canceled?: boolean;
     [key: string]: any;
 };
 export type ISocketClientInit = {
@@ -23,6 +24,9 @@ export type ISocketClientInit = {
     socketFactory?: () => SocketType;
     maxReconnectRetries?: number;
     autoReconnect?: boolean;
+};
+export type SocketClientTransactionState = {
+    canceled: boolean;
 };
 export declare enum ESocketClientEvent {
     RECONNECTED = "RECONNECTED"
@@ -39,6 +43,7 @@ export declare class SocketClient {
     socketFactory?: () => SocketType;
     maxReconnectRetries: number;
     events: EventSystem<SocketClientEventMap>;
+    transactionStates: Map<string, SocketClientTransactionState>;
     constructor(init: ISocketClientInit);
     private addReconnectHandler;
     reconnect(): Promise<void>;
@@ -51,7 +56,13 @@ export declare class SocketClient {
     onReady(fn: (client: SocketClient) => any): void;
     wait(timeout?: number): Promise<SocketClient | null>;
     receive(match: Record<string, any>, timeout?: number): Promise<BinaryKeyValueStore | null>;
+    private createTransactionState;
+    private transactionIsCanceled;
+    private deleteTransactionState;
+    cancelTransaction(name: string): void;
+    private withTransactionState;
     private startTransaction;
     private sendTransactionChunk;
+    private _transfer;
     transfer(args: SocketClientTransferArgs): Promise<SocketClientTransferResult>;
 }

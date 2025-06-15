@@ -14,6 +14,7 @@ export class SocketClient {
     socketFactory;
     maxReconnectRetries = 32;
     events = new EventSystem();
+    transactionStates = new Map();
     constructor(init) {
         this.socket = init.socket;
         if (init.autoReconnect !== false) {
@@ -171,6 +172,36 @@ export class SocketClient {
             });
         });
     }
+    /////////////////// Transactions
+    createTransactionState(name) {
+        this.transactionStates.set(name, {
+            canceled: false
+        });
+    }
+    transactionIsCanceled(name) {
+        const state = this.transactionStates.get(name);
+        if (!state)
+            return true;
+        if (state.canceled)
+            return true;
+        return false;
+    }
+    deleteTransactionState(name) {
+        this.transactionStates.delete(name);
+    }
+    cancelTransaction(name) {
+        const state = this.transactionStates.get(name);
+        if (!state)
+            return;
+        state.canceled = true;
+        this.deleteTransactionState(name);
+    }
+    async withTransactionState(name, fn) {
+        this.createTransactionState(name);
+        const resp = await fn();
+        this.deleteTransactionState(name);
+        return resp;
+    }
     async startTransaction(args) {
         const sock = await this.wait();
         if (!sock)
@@ -205,14 +236,25 @@ export class SocketClient {
             return false;
         return true;
     }
-    async transfer(args) {
-        const startOk = await this.startTransaction(args);
-        if (!startOk) {
+    async _transfer(args) {
+        const finishWithStatus = (resp) => {
             if (args.onFinish) {
-                args.onFinish(this, false);
+                args.onFinish(this, resp.ok);
             }
-            return { ok: false };
-        }
+            if (resp.canceled) {
+                this.send(BinaryKeyValueStore.fromJS({
+                    app: args.app,
+                    name: args.name,
+                    action: 'TRANSACTION_CANCEL'
+                }));
+            }
+            return resp;
+        };
+        const startOk = await this.startTransaction(args);
+        if (!startOk)
+            return finishWithStatus({ ok: false });
+        if (this.transactionIsCanceled(args.name))
+            return finishWithStatus({ ok: false, canceled: true });
         const blob = args.data;
         const chunkSize = args.chunkSize || DEFAULT_TRANSFER_CHUNKSIZE;
         const numChunks = Math.ceil(blob.size / chunkSize);
@@ -223,7 +265,9 @@ export class SocketClient {
             const part = blob.slice(offset, offset + chunkSize);
             const ok = await this.sendTransactionChunk(args, part, chunkIndex);
             if (!ok)
-                return { ok: false };
+                return finishWithStatus({ ok: false });
+            if (this.transactionIsCanceled(args.name))
+                return finishWithStatus({ ok: false, canceled: true });
             chunkIndex++;
             bytesSent += part.size;
             if (args.onProgress) {
@@ -236,21 +280,16 @@ export class SocketClient {
             name: args.name
         }));
         const resp = await this.receive({ action: 'TRANSACTION_END', app: args.app, name: args.name }, 10000);
-        if (!resp) {
-            if (args.onFinish) {
-                args.onFinish(this, false);
-            }
-            return { ok: false };
-        }
+        if (!resp)
+            return finishWithStatus({ ok: false });
         if (resp.get('ok') && resp.getBool('ok') === false) {
-            if (args.onFinish) {
-                args.onFinish(this, false);
-            }
-            return { ...resp.toJS(), ok: false };
+            return finishWithStatus({ ...resp.toJS(), ok: false });
         }
-        if (args.onFinish) {
-            args.onFinish(this, true);
-        }
-        return { ...resp.toJS(), ok: true };
+        return finishWithStatus({ ...resp.toJS(), ok: true });
+    }
+    async transfer(args) {
+        return await this.withTransactionState(args.name, async () => {
+            return await this._transfer(args);
+        });
     }
 }
