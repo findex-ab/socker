@@ -1,6 +1,6 @@
 {
   "name": "socker",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "",
   "homepage": "https://github.com/findex-ab/socker#readme",
   "bugs": {
@@ -27,44 +27,44 @@
   "exports": {
     "./shared": {
       "import": {
-        "types": "./shared/dist/lib/index.d.ts",
-        "default": "./shared/dist/lib/index.js"
+        "types": "./shared/dist/es/index.d.ts",
+        "default": "./shared/dist/es/index.js"
       },
       "require": {
-        "types": "./shared/dist/lib/index.d.ts",
-        "default": "./shared/dist/lib/index.js"
+        "types": "./shared/dist/es/index.d.ts",
+        "default": "./shared/dist/es/index.js"
       },
       "default": {
-        "types": "./shared/dist/lib/index.d.ts",
-        "default": "./shared/dist/lib/index.js"
+        "types": "./shared/dist/es/index.d.ts",
+        "default": "./shared/dist/es/index.js"
       }
     },
     "./server": {
       "import": {
-        "types": "./server/dist/lib/index.d.ts",
-        "default": "./server/dist/lib/index.js"
+        "types": "./server/dist/es/index.d.ts",
+        "default": "./server/dist/es/index.js"
       },
       "require": {
-        "types": "./server/dist/lib/index.d.ts",
-        "default": "./server/dist/lib/index.js"
+        "types": "./server/dist/es/index.d.ts",
+        "default": "./server/dist/es/index.js"
       },
       "default": {
-        "types": "./server/dist/lib/index.d.ts",
-        "default": "./server/dist/lib/index.js"
+        "types": "./server/dist/es/index.d.ts",
+        "default": "./server/dist/es/index.js"
       }
     },
     "./client": {
       "import": {
-        "types": "./client/dist/lib/index.d.ts",
-        "default": "./client/dist/lib/index.js"
+        "types": "./client/dist/es/index.d.ts",
+        "default": "./client/dist/es/index.js"
       },
       "require": {
-        "types": "./client/dist/lib/index.d.ts",
-        "default": "./client/dist/lib/index.js"
+        "types": "./client/dist/es/index.d.ts",
+        "default": "./client/dist/es/index.js"
       },
       "default": {
-        "types": "./client/dist/lib/index.d.ts",
-        "default": "./client/dist/lib/index.js"
+        "types": "./client/dist/es/index.d.ts",
+        "default": "./client/dist/es/index.js"
       }
     }
   },
