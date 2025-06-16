@@ -250,13 +250,18 @@ export class SockerServer {
                     console.error("Invalid message data");
                     return;
                 }
-                this.events.emit({
-                    connection,
-                    data: BinaryKeyValueStore.fromBinary(converted),
-                    isBinary: isBinary,
-                    eventType: EServerEvent.CLIENT_MESSAGE,
-                    server: this,
-                });
+                try {
+                    this.events.emit({
+                        connection,
+                        data: BinaryKeyValueStore.fromBinary(converted),
+                        isBinary: isBinary,
+                        eventType: EServerEvent.CLIENT_MESSAGE,
+                        server: this,
+                    });
+                }
+                catch (e) {
+                    console.error(e);
+                }
             });
             socket.on("upgrade", (req) => {
                 this.events.emit({
