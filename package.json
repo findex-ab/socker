@@ -1,6 +1,6 @@
 {
   "name": "socker",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "",
   "homepage": "https://github.com/findex-ab/socker#readme",
   "bugs": {
@@ -26,37 +26,50 @@
   ],
   "exports": {
     "./shared": {
-      "default": {
+      "import": {
         "types": "./shared/dist/lib/index.d.ts",
         "default": "./shared/dist/lib/index.js"
       },
-      "main": {
+      "require": {
+        "types": "./shared/dist/lib/index.d.ts",
+        "default": "./shared/dist/lib/index.js"
+      },
+      "default": {
         "types": "./shared/dist/lib/index.d.ts",
         "default": "./shared/dist/lib/index.js"
       }
     },
     "./server": {
-      "default": {
+      "import": {
         "types": "./server/dist/lib/index.d.ts",
         "default": "./server/dist/lib/index.js"
       },
-      "main": {
+      "require": {
+        "types": "./server/dist/lib/index.d.ts",
+        "default": "./server/dist/lib/index.js"
+      },
+      "default": {
         "types": "./server/dist/lib/index.d.ts",
         "default": "./server/dist/lib/index.js"
       }
     },
     "./client": {
-      "default": {
+      "import": {
         "types": "./client/dist/lib/index.d.ts",
         "default": "./client/dist/lib/index.js"
       },
-      "main": {
+      "require": {
+        "types": "./client/dist/lib/index.d.ts",
+        "default": "./client/dist/lib/index.js"
+      },
+      "default": {
         "types": "./client/dist/lib/index.d.ts",
         "default": "./client/dist/lib/index.js"
       }
     }
   },
   "devDependencies": {
+    "esbuild": "^0.25.5",
     "pm2": "^6.0.8",
     "tsx": "^4.20.2"
   },

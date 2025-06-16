@@ -1,0 +1,47 @@
+import { WebSocketServer } from "ws";
+import { EventSystem } from "socker/shared";
+import { ServerEventMap } from "./serverEvents";
+import { IServerApp, IServerAppMeta } from "./serverApp";
+import { ServerMessageEventHook } from "./hooks";
+import { BinaryKeyValueStore } from "socker/shared";
+import { BasicState, StateSystem } from "socker/shared";
+import { SocketClient } from "socker/client";
+import { IClientMeta } from "./client";
+import { InternalEventHandler } from "./internalEventHandler";
+export type SockerServerConfig = {
+    host: string;
+    port: number;
+    httpsCertificatePath?: string;
+};
+export declare class SockerServer {
+    config: SockerServerConfig;
+    socket: WebSocketServer | null;
+    events: EventSystem<ServerEventMap>;
+    internalEventHandler: InternalEventHandler;
+    apps: Map<string, IServerApp>;
+    appMetas: Map<string, IServerAppMeta>;
+    stateSystem: StateSystem;
+    clientCleanups: Map<string, Set<() => void>>;
+    clients: Map<string, SocketClient>;
+    clientMetas: Map<string, IClientMeta>;
+    constructor(config: SockerServerConfig);
+    createClientCleanup(clientId: string, fn: () => void): void;
+    runClientCleanups(clientId: string): void;
+    use(app: IServerApp): void;
+    getClient(id: string): SocketClient | null;
+    findClientsByMeta(meta: Record<PropertyKey, any>): Array<SocketClient>;
+    findClientByMeta(meta: Record<PropertyKey, any>): SocketClient | null;
+    getClientMeta(clientId: string): IClientMeta | null;
+    getClientApps(clientId: string): Array<IServerApp>;
+    getApp(name: string): IServerApp | null;
+    getAppMeta(name: string): IServerAppMeta | null;
+    getOrCreateAppMeta(name: string): IServerAppMeta;
+    defineMessageHook<T = any>(appName: string, hook: ServerMessageEventHook<T>): void;
+    useClientState<T extends BasicState>(appName: string, clientId: string, init: T): [T, (fn: (old: T) => T) => void];
+    getAllClients(): Array<SocketClient>;
+    getClientsInApp(appName: string): Array<SocketClient>;
+    broadcast(message: BinaryKeyValueStore): void;
+    private initApps;
+    private postStart;
+    start(): import("ws").Server<typeof import("ws").default, typeof import("http").IncomingMessage>;
+}
