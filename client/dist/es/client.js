@@ -3810,12 +3810,15 @@ var BinaryPrimitive = class _BinaryPrimitive {
   setString(value) {
     this.type = 1 /* ARRAY */;
     this.componentType = 7 /* CHAR */;
-    this.data = new Uint8Array(Array.from(value).map((c) => c.charCodeAt(0)));
+    const encoder = new TextEncoder();
+    this.data = encoder.encode(value);
     this.size = this.data.length;
     return this;
   }
   getString() {
-    return this.getRawBytes().map((code) => String.fromCharCode(Number(code))).join("");
+    const bytes = this.getBytes();
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
   }
   setNull() {
     this.data = new Uint8Array();
