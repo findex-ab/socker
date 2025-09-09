@@ -9,8 +9,9 @@
   "module": "./dist/es/index.js",
   "main": "./dist/es/index.js",
   "scripts": {
-    "build:es": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/es --bundle --platform=node --target=node18",
-    "build": "tsc --build && tsc-alias && npm run build:es",
+    "build:es": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/es --bundle --platform=node",
+    "build:cjs": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/cjs --bundle --platform=node --format=cjs",
+    "build": "tsc --build && tsc-alias && npm run build:es && npm run build:cjs",
     "test": "npx tsx --test --experimental-test-module-mocks \"./src/**/*.test.ts\" --report-compact --no-warnings"
   },
   "devDependencies": {
