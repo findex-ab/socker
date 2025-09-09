@@ -189,9 +189,8 @@ var BinaryPrimitive = class _BinaryPrimitive {
     return this;
   }
   getString() {
-    const bytes = this.getBytes();
     const decoder = new TextDecoder();
-    return decoder.decode(bytes);
+    return decoder.decode(this.getBytes());
   }
   setNull() {
     this.data = new Uint8Array();

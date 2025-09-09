@@ -100,8 +100,11 @@ export class DynamicBuffer {
     return view.getFloat64(0, false);
   }
 
-  readString(length: number) {
-    return this.readBytes(length).map(code => String.fromCharCode(Number(code))).join('')
+  readString(length: number): string {
+    const bytes = this.read(length);
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
+    //return this.readBytes(length).map(code => String.fromCharCode(Number(code))).join('')
   }
 
   readBinaryBlob(): BinaryBlob | null {
@@ -150,7 +153,11 @@ export class DynamicBuffer {
   }
 
   writeString(text: string) {
-    this.write(Uint8Array.from(Array.from(text).map(letter => letter.charCodeAt(0))));
+
+    const encoder = new TextEncoder();
+    this.write(encoder.encode(text));
+    
+    //this.write(Uint8Array.from(Array.from(text).map(letter => letter.charCodeAt(0))));
   }
 
   writeUint32(x: number) {

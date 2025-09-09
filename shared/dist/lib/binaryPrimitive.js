@@ -148,16 +148,14 @@ export class BinaryPrimitive {
         this.type = EBinaryPrimitiveType.ARRAY;
         this.componentType = EBinaryPrimitiveComponentType.CHAR;
         const encoder = new TextEncoder();
-        this.data = encoder.encode(value);
-        //this.data = new Uint8Array(Array.from(value).map(c => c.charCodeAt(0)));
+        this.data = encoder.encode(value); //new Uint8Array(Array.from(value).map(c => c.charCodeAt(0)));
         this.size = this.data.length;
         return this;
     }
     getString() {
-        const bytes = this.getBytes();
         const decoder = new TextDecoder();
-        return decoder.decode(bytes);
-        //return this.getRawBytes().map(code => String.fromCharCode(Number(code))).join('')
+        return decoder.decode(this.getBytes());
+        // return this.getRawBytes().map(code => String.fromCharCode(Number(code))).join('')
     }
     setNull() {
         this.data = new Uint8Array();
