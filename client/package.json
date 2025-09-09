@@ -9,7 +9,7 @@
   "module": "./dist/es/index.js",
   "main": "./dist/es/index.js",
   "scripts": {
-    "build:es": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/es --bundle --platform=node --target=node18",
+    "build:es": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/es --bundle --platform=node --target=esnext",
     "build": "tsc --build && tsc-alias && npm run build:es",
     "lint": "prettier ./src --write",
     "test": "npx tsx --test --experimental-test-module-mocks \"./src/**/*.test.ts\" --report-compact --no-warnings"
