@@ -143,10 +143,8 @@ export class SocketClient {
     if (!this.checkSocketAndWarn()) return () => {};
     this.socket.binaryType = "arraybuffer";
     const listener = (event: MessageEvent<any>) => {
-      console.dir(event);
       const data = BinaryKeyValueStore.fromBinarySafe(event.data);
       if (data) {
-        console.dir(data.toJS());
         fn(data);
       } else {
         console.error('bad data');

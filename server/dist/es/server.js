@@ -8298,10 +8298,8 @@ var SocketClient = class {
     };
     this.socket.binaryType = "arraybuffer";
     const listener = (event) => {
-      console.dir(event);
       const data = BinaryKeyValueStore.fromBinarySafe(event.data);
       if (data) {
-        console.dir(data.toJS());
         fn(data);
       } else {
         console.error("bad data");
