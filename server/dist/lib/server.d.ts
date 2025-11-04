@@ -1,11 +1,11 @@
 import { WebSocketServer } from "ws";
-import { EventSystem } from "#/shared/eventSystem";
+import { EventSystem } from "socker/shared";
 import { ServerEventMap } from "./serverEvents";
 import { IServerApp, IServerAppMeta } from "./serverApp";
 import { ServerMessageEventHook } from "./hooks";
-import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
-import { BasicState, StateSystem } from "#/shared/stateSystem";
-import { SocketClient } from "#/client/client";
+import { BinaryKeyValueStore } from "socker/shared";
+import { BasicState, StateSystem } from "socker/shared";
+import { SocketClient } from "socker/client";
 import { IClientMeta } from "./client";
 import { InternalEventHandler } from "./internalEventHandler";
 export type SockerServerConfig = {

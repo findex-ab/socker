@@ -1,7 +1,7 @@
-import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
+import { BinaryKeyValueStore } from "socker/shared";
 import { SocketImplementation } from "./socket";
 import { sleep } from "./utils";
-import { EventSystem } from "#/shared/eventSystem";
+import { EventSystem } from "socker/shared";
 const DEFAULT_TRANSFER_CHUNKSIZE = 1000000; // 1mb
 export var ESocketClientEvent;
 (function (ESocketClientEvent) {

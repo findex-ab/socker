@@ -1,4 +1,4 @@
-import { AnyStateSystemEvent } from "#/shared/stateSystem";
+import { AnyStateSystemEvent } from "socker/shared";
 import { type SockerServer } from "./server";
 import { AnyServerEvent } from "./serverEvents";
 export declare class InternalEventHandler {

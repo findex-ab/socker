@@ -9,8 +9,8 @@
   "module": "./dist/lib/index.js",
   "main": "./dist/lib/index.js",
   "scripts": {
-    "build:es": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/es --bundle --platform=node",
-    "build:iife": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/** --outdir=./dist/iife --bundle --platform=node --format=iife",
+    "build:es": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/**/*.ts --outdir=./dist/es --bundle --platform=node",
+    "build:iife": "tsc -p tsconfig.json --declaration --outDir ./dist/es && esbuild ./src/**/*.ts --outdir=./dist/iife --bundle --platform=node --format=iife",
     "build": "tsc --build && tsc-alias && npm run build:es && npm run build:iife",
     "lint": "prettier ./src --write",
     "test": "npx tsx --test --experimental-test-module-mocks \"./src/**/*.test.ts\" --report-compact --no-warnings"

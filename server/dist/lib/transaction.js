@@ -1,5 +1,5 @@
-import { BinaryKeyValueStore } from '#/shared/binaryKVStore';
-import { BinaryPrimitive, EBinaryPrimitiveComponentType, EBinaryPrimitiveType } from '#/shared/binaryPrimitive';
+import { BinaryKeyValueStore } from 'socker/shared';
+import { BinaryPrimitive, EBinaryPrimitiveComponentType, EBinaryPrimitiveType } from 'socker/shared';
 import fs from 'fs';
 import pathlib from 'path';
 import * as UUID from 'uuid';
