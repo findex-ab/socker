@@ -1,6 +1,6 @@
 import { describe } from "node:test";
 import { Transaction } from "./transaction";
-import { BinaryPrimitive } from "socker/shared";
+import { BinaryPrimitive } from "#/shared/binaryPrimitive";
 import assert from "node:assert";
 // /tmp/f4211f94-4dd7-5e4d-88c4-034a56fd250d.bin
 describe("Stuff", () => {

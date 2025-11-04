@@ -1,7 +1,7 @@
-import { BinaryKeyValueStore } from "socker/shared";
+import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
 import { IncomingMessage } from "http";
 import { SocketType } from "./socket";
-import { EventSystem } from "socker/shared";
+import { EventSystem } from "#/shared/eventSystem";
 export type SocketClientMessageCallbackFunction = (data: BinaryKeyValueStore) => any;
 export type SocketClientTransferArgs = {
     data: Blob | File;

@@ -8316,6 +8316,7 @@ var SocketClient = class {
   transactionStates = /* @__PURE__ */ new Map();
   constructor(init) {
     this.socket = init.socket;
+    this.socket.binaryType = "arraybuffer";
     if (init.autoReconnect !== false) {
       this.addReconnectHandler(this.socket);
     }
@@ -8388,7 +8389,6 @@ var SocketClient = class {
     };
     this.socket.binaryType = "arraybuffer";
     const listener = (event) => {
-      console.log("EVENT", event);
       console.dir(event);
       const data = BinaryKeyValueStore.fromBinarySafe(event.data);
       if (data) {

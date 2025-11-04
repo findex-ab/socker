@@ -1,4 +1,4 @@
-import { SocketClient } from "socker/client";
+import { SocketClient } from "#/client/client";
 import { ServerMessageEventHook } from "./hooks";
 import { SockerServer } from "./server";
 import { AnyServerEvent } from "./serverEvents";

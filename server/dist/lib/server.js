@@ -2,12 +2,12 @@ import { WebSocketServer } from "ws";
 import * as fs from "fs";
 import * as https from "https";
 import * as pathlib from "path";
-import { EventSystem } from "socker/shared";
+import { EventSystem } from "#/shared/eventSystem";
 import { EServerEvent } from "./serverEvents";
 import * as UUID from "uuid";
-import { BinaryKeyValueStore } from "socker/shared";
-import { StateSystem, } from "socker/shared";
-import { SocketClient } from "socker/client";
+import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
+import { StateSystem, } from "#/shared/stateSystem";
+import { SocketClient } from "#/client/client";
 import { InternalEventHandler } from "./internalEventHandler";
 export class SockerServer {
     config;

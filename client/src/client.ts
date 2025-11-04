@@ -143,7 +143,6 @@ export class SocketClient {
     if (!this.checkSocketAndWarn()) return () => {};
     this.socket.binaryType = "arraybuffer";
     const listener = (event: MessageEvent<any>) => {
-      console.log('EVENT', event);
       console.dir(event);
       const data = BinaryKeyValueStore.fromBinarySafe(event.data);
       if (data) {

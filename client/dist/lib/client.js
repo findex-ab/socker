@@ -1,7 +1,7 @@
-import { BinaryKeyValueStore } from "socker/shared";
+import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
 import { SocketImplementation } from "./socket";
 import { sleep } from "./utils";
-import { EventSystem } from "socker/shared";
+import { EventSystem } from "#/shared/eventSystem";
 const DEFAULT_TRANSFER_CHUNKSIZE = 1000000; // 1mb
 export var ESocketClientEvent;
 (function (ESocketClientEvent) {
@@ -17,6 +17,7 @@ export class SocketClient {
     transactionStates = new Map();
     constructor(init) {
         this.socket = init.socket;
+        this.socket.binaryType = "arraybuffer";
         if (init.autoReconnect !== false) {
             this.addReconnectHandler(this.socket);
         }
@@ -93,7 +94,6 @@ export class SocketClient {
             return () => { };
         this.socket.binaryType = "arraybuffer";
         const listener = (event) => {
-            console.log('EVENT', event);
             console.dir(event);
             const data = BinaryKeyValueStore.fromBinarySafe(event.data);
             if (data) {

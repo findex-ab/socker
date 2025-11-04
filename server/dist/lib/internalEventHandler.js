@@ -1,5 +1,5 @@
-import { BinaryKeyValueStore } from "socker/shared";
-import { EStateSystemEvent } from "socker/shared";
+import { BinaryKeyValueStore } from "#/shared/binaryKVStore";
+import { EStateSystemEvent } from "#/shared/stateSystem";
 import { EServerEvent } from "./serverEvents";
 export class InternalEventHandler {
     server;
