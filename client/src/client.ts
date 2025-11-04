@@ -58,6 +58,7 @@ export class SocketClient {
 
   constructor(init: ISocketClientInit) {
     this.socket = init.socket;
+    this.socket.binaryType = "arraybuffer";
     if (init.autoReconnect !== false) {
       this.addReconnectHandler(this.socket);
     }
